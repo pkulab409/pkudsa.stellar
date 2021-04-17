@@ -3,6 +3,7 @@ import threading
 import _thread
 from GameException import TimeoutException
 
+
 @contextmanager
 def time_limit(seconds, msg=''):
     timer = threading.Timer(seconds, lambda: _thread.interrupt_main())

@@ -46,14 +46,14 @@ class Game:
         map_info2 = deepcopy(self.__map)
         try:
             with time_limit(self.__max_time, "player1"):
-                player1_actions = self.player_func1(map_info1,0)
+                player1_actions = self.player_func1(map_info1, 0)
         except Exception:
             print("Player func 1 error!")
             # 这里是否应该捕捉到异常之后直接判负?
             player1_actions = []
         try:
             with time_limit(self.__max_time, "player2"):
-                player2_actions = self.player_func2(map_info2,1)
+                player2_actions = self.player_func2(map_info2, 1)
         except Exception:
             print("Player func 2 error!")
             player2_actions = []
@@ -69,7 +69,7 @@ class Game:
         for turn in range(self.__max_turn):
             self.next_step()
 
-            print(self.__map) # 测试代码，记得删
+            print(self.__map)  # 测试代码，记得删
             print("___________________________________________________________________________")
 
             if self.__game_end:

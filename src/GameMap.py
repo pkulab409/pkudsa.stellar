@@ -2,43 +2,41 @@ from Node import Node
 
 
 class GameMap:
-    def __init__(self,design):#由于地图是固定的，因此init不需要参数。
-        self.__nodes = [Node(i) for i in range(len(design)+1)]
+    def __init__(self, design):  # 由于地图是固定的，因此init不需要参数。
+        self.__nodes = [Node(i) for i in range(len(design) + 1)]
         self.nodes[1].change_owner(0)
-        self.nodes[1].power = [100,0]
+        self.nodes[1].power = [100, 0]
         self.nodes[len(design)].change_owner(1)
-        self.nodes[len(design)].power = [0,100]
+        self.nodes[len(design)].power = [0, 100]
 
         for number in design.keys():
             for nextnumber in design[number].keys():
-                self.__nodes[number].set_connection(nextnumber,design[number][nextnumber])
+                self.__nodes[number].set_connection(nextnumber, design[number][nextnumber])
         # initialize according to the map design
-    
-    def __repr__(self): # 方便测试时打印地图
+
+    def __repr__(self):  # 方便测试时打印地图
         ans = []
         for i in self.nodes[1::]:
             ans.append(repr(i))
         return "\n".join(ans)
 
-
-
     @property
     def nodes(self):
         return self.__nodes
 
-    def __judge(self, player_actionlist:list, tmp_player_id:int = 0):
+    def __judge(self, player_actionlist: list, tmp_player_id: int = 0):
         """
         此函数用于判断当回合派遣兵力是否合法
         传入参数为玩家当回合所有操作的表，如：[[1,2,5.0],[1,3,4.0],[2,3,6.0]]
         若派遣兵力总数大于该节点兵力则引发 RuntimeError
         """
-        dic={} # dic[i]代表每个节点派出去多少兵
+        dic = {}  # dic[i]代表每个节点派出去多少兵
         for player_action in player_actionlist:
             if player_action[0] not in dic:
                 dic[player_action[0]] = player_action[2]
             else:
                 dic[player_action[0]] += player_action[2]
-        #print(dic)
+        # print(dic)
         for i in dic:
             if dic[i] >= self.__nodes[i].power[tmp_player_id]:
                 raise RuntimeError('Judgement!!! Invalid move:no enough power')
@@ -62,16 +60,17 @@ class GameMap:
         start = player_action[0]
         end = player_action[1]
         power = player_action[2]
-        if not (isinstance(player, int) and isinstance(start, int) and isinstance(end, int) and (isinstance(power, float) or isinstance(power, int))):  # 输入是否合法
-            raise RuntimeError('invalid input: %s'%str(player_action))
+        if not (isinstance(player, int) and isinstance(start, int) and isinstance(end, int) and (
+                isinstance(power, float) or isinstance(power, int))):  # 输入是否合法
+            raise RuntimeError('invalid input: %s' % str(player_action))
         if copyMapNodes[start].belong != tmp_player_id:  # 派出兵力点不属于该玩家
-            raise RuntimeError('invalid move: wrong basement: %s'%str(player_action))
+            raise RuntimeError('invalid move: wrong basement: %s' % str(player_action))
         if end not in copyMapNodes[start].get_next():  # 目标兵力节点与派出点不相连
-            raise RuntimeError('invalid move: no connection: %s'%str(player_action))
+            raise RuntimeError('invalid move: no connection: %s' % str(player_action))
         if power >= copyMapNodes[start].power[tmp_player_id]:  # 派出兵力大于等于存在兵力
-            raise RuntimeError('invalid move: no enough power: %s'%str(player_action)
-            +str(self)#测试
-            )
+            raise RuntimeError('invalid move: no enough power: %s' % str(player_action)
+                               + str(self)  # 测试
+                               )
 
         # 以下为行动主体函数
         temp = copyMapNodes[start].power
@@ -87,20 +86,22 @@ class GameMap:
     def __combat(self):
         """第一部分为战斗过程，第二部分为战斗结算和归属变更
         """
+
         def combat_inner(nd):
-            
+
             de = min(nd.power)
-            nd.power = [(nd.power[0]**2-de**2)**0.5, (nd.power[1]**2-de**2)**0.5]
+            nd.power = [(nd.power[0] ** 2 - de ** 2) ** 0.5, (nd.power[1] ** 2 - de ** 2) ** 0.5]
 
             # result of combat
             p1 = nd.power[0]
             p2 = nd.power[1]
             if p1 == 0 and p2 == 0:
-                nd.change_owner(-1) #中立：-1
+                nd.change_owner(-1)  # 中立：-1
             elif p1 == 0 and nd.belong == 0:
                 nd.change_owner(1)
             elif p2 == 0 and nd.belong == 1:
                 nd.change_owner(0)
+
         for node in self.__nodes:
             combat_inner(node)
 
@@ -137,18 +138,18 @@ class GameMap:
             超过的战力可以及时派出去。
         """
         for n in self.nodes:
-            if n.belong==0:
+            if n.belong == 0:
                 n.power[0] = n.power[0] + n.spawn_rate * \
-                    (n.power_limit - n.power[0]) * n.power[0]
+                             (n.power_limit - n.power[0]) * n.power[0]
                 if n.power[1] > n.power_limit:
                     n.power[1] = n.power[1] + n.spawn_rate * \
-                        (n.power_limit - n.power[1]) * n.power[1]
-            if n.belong==1:
+                                 (n.power_limit - n.power[1]) * n.power[1]
+            if n.belong == 1:
                 n.power[1] = n.power[1] + n.spawn_rate * \
-                    (n.power_limit - n.power[1]) * n.power[1]
+                             (n.power_limit - n.power[1]) * n.power[1]
                 if n.power[0] > n.power_limit:
                     n.power[0] = n.power[0] + n.spawn_rate * \
-                        (n.power_limit - n.power[0]) * n.power[0]
+                                 (n.power_limit - n.power[0]) * n.power[0]
 
     def update(self, player1_actions, player2_actions):
         """[summary]
