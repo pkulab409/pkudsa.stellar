@@ -49,7 +49,6 @@ class Game:
                 player1_actions = self.player_func1(map_info1, 1)
         except Exception:
             print("Player func 1 error!")
-            # 这里是否应该捕捉到异常之后直接判负?
             player1_actions = []
         try:
             with time_limit(self.__max_time, "player2"):

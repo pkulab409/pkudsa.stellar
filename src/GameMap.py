@@ -38,7 +38,7 @@ class GameMap:
 
     def __repr__(self):  # 方便测试时打印地图
         ans = []
-        for i in self.__nodes[1::]:
+        for i in self.__nodes:
             ans.append(repr(i))
         return "\n".join(ans)
 
@@ -143,17 +143,17 @@ class GameMap:
         """
         for node in self.__nodes:
             if node.owner == 1:
-                node.troop[0] = node.troop[0] + node.spawn_rate * \
-                             (node.supply_limit - node.troop[0]) * node.troop[0]
+                node.troop[1] = node.troop[1] + node.spawn_rate * \
+                             (node.supply_limit - node.troop[1]) * node.troop[1]
+                if node.troop[2] > node.supply_limit:
+                    node.troop[2] = node.troop[2] + node.spawn_rate * \
+                                 (node.supply_limit - node.troop[2]) * node.troop[2]
+            if node.owner == 2:
+                node.troop[2] = node.troop[2] + node.spawn_rate * \
+                             (node.supply_limit - node.troop[2]) * node.troop[2]
                 if node.troop[1] > node.supply_limit:
                     node.troop[1] = node.troop[1] + node.spawn_rate * \
                                  (node.supply_limit - node.troop[1]) * node.troop[1]
-            if node.owner == 2:
-                node.troop[1] = node.troop[1] + node.spawn_rate * \
-                             (node.supply_limit - node.troop[1]) * node.troop[1]
-                if node.troop[0] > node.supply_limit:
-                    node.troop[0] = node.troop[0] + node.spawn_rate * \
-                                 (node.supply_limit - node.troop[0]) * node.troop[0]
 
     def update(self, player1_actions: List[Tuple[int, int, float]], player2_actions: List[Tuple[int, int, float]]):
         """[summary]
@@ -178,7 +178,6 @@ class GameMap:
         """
         :return: 1, 2 if one player wins by occupying the opposite's base, None otherwise
         Node[0]和Node[N-1]分别是player1和player2的基地
-        请将以下代码替换interface1.1.py中，GameMap类end_early()方法中的pass
         """
 
         if self.__nodes[self.__player1_base].owner == 2:
@@ -199,10 +198,10 @@ class GameMap:
             if self.__nodes[i].owner == 1:
                 n_node1 += 1
                 # .army中,[0]是玩家1的兵力,[1]是玩家2的兵力
-                n_army1 += self.__nodes[i].troop[0]
+                n_army1 += self.__nodes[i].troop[1]
             elif self.__nodes[i].owner == 2:
                 n_node2 += 1
-                n_army2 += self.__nodes[i].troop[1]
+                n_army2 += self.__nodes[i].troop[2]
         if n_node1 > n_node2:
             return 1
         elif n_node1 < n_node2:
