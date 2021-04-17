@@ -12,15 +12,12 @@ class Node:
 
     def __repr__(self):
         ans = "-----Node info: "
-        ans += "Node number(ID): "+str(self.number)+"-----\n"
-        ans += "Node owner: "+str(self.belong)+"\n"
-        ans += "Node power: player_1 "+str(self.power[0])+", player_2 "+str(self.power[1])+"\n"
+        ans += "Node number(ID): " + str(self.number) + "-----\n"
+        ans += "Node owner: " + str(self.belong) + "\n"
+        ans += "Node power: player_1 " + str(self.power[0]) + ", player_2 " + str(self.power[1]) + "\n"
         ans += "Node is connected to: "
-        ans += repr(self.get_next())+"\n\n"
+        ans += repr(self.get_next()) + "\n\n"
         return ans
-
-
-
 
     @property
     def number(self):
@@ -39,10 +36,10 @@ class Node:
         return self.__nextinfo[next_]
 
     @property
-    def belong(self): # int, -1, 0, or 1
+    def belong(self):  # int, -1, 0, or 1
         return self.__belong
 
-    def change_owner(self, owner:int):
+    def change_owner(self, owner: int):
         self.__belong = owner
 
     @property
