@@ -1,67 +1,66 @@
-from Node import Node
 from MapDesign import g_map_xy
+from Node import Node
+
 # 重要约定！！！
 PLAYER_1 = 0
 PLAYER_2 = 1
 
 
 class GameMap:
-    def __init__(self,design:dict):#由于地图是固定的，因此init不需要参数。
-        self.__nodes = [Node(i) for i in range(len(design)+1)]
+    def __init__(self, design: dict):  # 由于地图是固定的，因此init不需要参数。
+        self.__nodes = [Node(i) for i in range(len(design) + 1)]
         self.nodes[1].change_owner(0)
-        self.nodes[1].set_power([100,0])
+        self.nodes[1].set_power([100, 0])
         self.nodes[len(design)].change_owner(1)
-        self.nodes[len(design)].set_power([0,100])
+        self.nodes[len(design)].set_power([0, 100])
 
         for number in design.keys():
             for nextnumber in design[number].keys():
-                self.__nodes[number].set_connection(nextnumber,design[number][nextnumber])
+                self.__nodes[number].set_connection(nextnumber, design[number][nextnumber])
         # initialize according to the map design
-    
-    def __repr__(self): # 方便测试时打印地图
+
+    def __repr__(self):  # 方便测试时打印地图
         ans = []
         for i in self.nodes[1::]:
             ans.append(repr(i))
-        return "\n".join(ans)+"\n"
-
-
+        return "\n".join(ans) + "\n"
 
     @property
     def nodes(self):
         return self.__nodes
 
-    def __judge(self, player_actionlist:list, tmp_player_id:int = 0):
+    def __judge(self, player_actionlist: list, tmp_player_id: int = 0):
         """
         此函数用于判断当回合派遣兵力是否合法
         传入参数为玩家当回合所有操作的表，如：[[1,2,5.0],[1,3,4.0],[2,3,6.0]]
         若派遣兵力总数大于该节点兵力则引发 RuntimeError
         """
-        dic={} # dic[i]代表每个节点派出去多少兵
+        dic = {}  # dic[i]代表每个节点派出去多少兵
         for player_action in player_actionlist:
-            if type(player_action)!=tuple:
+            if type(player_action) != tuple:
                 raise RuntimeError("Judgement!!! Invalid input type! ")
-            if len(player_action)!=3:
+            if len(player_action) != 3:
                 raise RuntimeError("Judgement!!! Invalid input length! ")
-            
-            if type(player_action[0])!=int:
-                raise RuntimeError("Judgement!!! Invalid input type! ")
-            if type(player_action[1])!=int:
-                raise RuntimeError("Judgement!!! Invalid input type! ")
-            if type(player_action[2])!=int and type(player_action[2])!=float:
-                raise RuntimeError("Judgement!!! Invalid input type! ")#判断三个输入是不是int/float
 
-            if player_action[2]<0.01:
+            if type(player_action[0]) != int:
+                raise RuntimeError("Judgement!!! Invalid input type! ")
+            if type(player_action[1]) != int:
+                raise RuntimeError("Judgement!!! Invalid input type! ")
+            if type(player_action[2]) != int and type(player_action[2]) != float:
+                raise RuntimeError("Judgement!!! Invalid input type! ")  # 判断三个输入是不是int/float
+
+            if player_action[2] < 0.01:
                 raise RuntimeError("Judgement!!! Invalid input value(<=0)! ")
-            if player_action[0]<=0 or player_action[0]>=len(self.nodes):
-                raise RuntimeError('Judgement!!! Invalid input target(out of range): %s'%str(player_action))
+            if player_action[0] <= 0 or player_action[0] >= len(self.nodes):
+                raise RuntimeError('Judgement!!! Invalid input target(out of range): %s' % str(player_action))
 
             if player_action[0] not in dic:
                 dic[player_action[0]] = player_action[2]
             else:
                 dic[player_action[0]] += player_action[2]
-        #print(dic)
+        # print(dic)
         for i in dic:
-            if dic[i] >= self.__nodes[i].power[tmp_player_id]-0.01:
+            if dic[i] >= self.__nodes[i].power[tmp_player_id] - 0.01:
                 raise RuntimeError('Judgement!!! Invalid move:no enough power')
 
     def __move(self, player: int, player_action: tuple):
@@ -82,40 +81,40 @@ class GameMap:
         start = player_action[0]
         end = player_action[1]
         power = player_action[2]
-        if not (isinstance(player, int) and isinstance(start, int) and isinstance(end, int) and (isinstance(power, float) or isinstance(power, int))):  # 输入是否合法
-            raise RuntimeError('invalid input type: %s'%str(player_action))
+        if not (isinstance(player, int) and isinstance(start, int) and isinstance(end, int) and (
+                isinstance(power, float) or isinstance(power, int))):  # 输入是否合法
+            raise RuntimeError('invalid input type: %s' % str(player_action))
         if self.nodes[start].belong != tmp_player_id:  # 派出兵力点不属于该玩家
-            raise RuntimeError('invalid move: wrong basement: %s'%str(player_action))
-        if self.nodes[start].power[tmp_player_id] <= power+0.01:   # power超过兵力上限
-            raise RuntimeError('invalid input value(too much): %s'%str(player_action))
+            raise RuntimeError('invalid move: wrong basement: %s' % str(player_action))
+        if self.nodes[start].power[tmp_player_id] <= power + 0.01:  # power超过兵力上限
+            raise RuntimeError('invalid input value(too much): %s' % str(player_action))
         if end not in self.nodes[start].get_next():  # 目标兵力节点与派出点不相连
-            raise RuntimeError('invalid move: no connection: %s'%str(player_action))
+            raise RuntimeError('invalid move: no connection: %s' % str(player_action))
 
         # 以下为行动主体函数
 
-        
         self.nodes[start].power[tmp_player_id] -= power
 
         # 以根号作为兵力损耗的单位并且家手过路费
-        power -= round(power ** 0.5 + self.nodes[start].get_nextCost(end),2)
+        power -= round(power ** 0.5 + self.nodes[start].get_nextCost(end), 2)
         power = 0.0 if power < 0.01 else power  # 兵力损耗至小于零时，相当于兵力为零
         self.nodes[end].power[tmp_player_id] += power
 
     def __combat(self):
         """第一部分为战斗过程，第二部分为战斗结算和归属变更
         """
-        def combat_inner(node:Node):
-            
-            if node.power[0]<=node.power[1]-0.01:
-                node.set_power([0, round( (node.power[1]**2-node.power[0]**2)**0.5, 2)])
+
+        def combat_inner(node: Node):
+
+            if node.power[0] <= node.power[1] - 0.01:
+                node.set_power([0, round((node.power[1] ** 2 - node.power[0] ** 2) ** 0.5, 2)])
                 node.change_owner(1)
-            elif node.power[0]>=node.power[1]+0.01:
-                node.set_power([round( (node.power[0]**2-node.power[1]**2)**0.5, 2), 0])
+            elif node.power[0] >= node.power[1] + 0.01:
+                node.set_power([round((node.power[0] ** 2 - node.power[1] ** 2) ** 0.5, 2), 0])
                 node.change_owner(0)
             else:
-                node.set_power([0,0])
+                node.set_power([0, 0])
                 node.change_owner(-1)
-
 
         for node in self.nodes:
             combat_inner(node)
@@ -154,31 +153,31 @@ class GameMap:
         """
         for n in self.nodes:
             new0 = n.power[0]
-            new1 = n.power[1]#两个临时变量
-            if n.belong==0:
+            new1 = n.power[1]  # 两个临时变量
+            if n.belong == 0:
                 new0 = round(
                     n.power[0] + n.spawn_rate * \
                     (n.power_limit - n.power[0]) * n.power[0]
-                ,2)
+                    , 2)
                 if n.power[1] > n.power_limit:
                     new1 = round(
                         n.power[1] + n.spawn_rate * \
                         (n.power_limit - n.power[1]) * n.power[1]
-                    ,2)
-                new0,new1 = max(new0,0),max(new1,0)
-                n.set_power([new0,new1])
-            if n.belong==1:
+                        , 2)
+                new0, new1 = max(new0, 0), max(new1, 0)
+                n.set_power([new0, new1])
+            if n.belong == 1:
                 new1 = round(
                     n.power[1] + n.spawn_rate * \
                     (n.power_limit - n.power[1]) * n.power[1]
-                ,2)
+                    , 2)
                 if n.power[0] > n.power_limit:
                     new0 = round(
                         n.power[0] + n.spawn_rate * \
                         (n.power_limit - n.power[0]) * n.power[0]
-                    ,2)
-                new0,new1 = max(new0,0),max(new1,0)
-                n.set_power([new0,new1])
+                        , 2)
+                new0, new1 = max(new0, 0), max(new1, 0)
+                n.set_power([new0, new1])
 
     def update(self, player1_actions, player2_actions):
         """[summary]
@@ -188,16 +187,16 @@ class GameMap:
             player2_actions ([type]): [description]
         """
 
-        #这两个try是为了让程序运行，不中断
+        # 这两个try是为了让程序运行，不中断
         try:
-            self.__judge(player1_actions,0)
+            self.__judge(player1_actions, 0)
         except:
             player1_actions = []
         try:
-            self.__judge(player2_actions,1)
+            self.__judge(player2_actions, 1)
         except:
             player2_actions = []
-        #如果要看玩家输入的数据有什么错误，就把这两个try删掉
+        # 如果要看玩家输入的数据有什么错误，就把这两个try删掉
 
         for action in player1_actions:
             self.__move(0, action)
@@ -214,13 +213,13 @@ class GameMap:
         请将以下代码替换interface1.1.py中，GameMap类end_early()方法中的pass
         """
 
-        if self.nodes[1].belong == 1 and self.nodes[len(self.nodes)-1].belong == 0:
+        if self.nodes[1].belong == 1 and self.nodes[len(self.nodes) - 1].belong == 0:
             return "draw"
-        if self.nodes[len(self.nodes)-1].belong == 0:
+        if self.nodes[len(self.nodes) - 1].belong == 0:
             return "player1"
         if self.nodes[1].belong == 1:
             return "player2"
-        
+
         return None
 
     def high_score(self):
@@ -248,22 +247,19 @@ class GameMap:
             return 'player2'
         else:
             return None
-    
 
-
-
-    def export_as_dic(self, action_lst_1:list, action_lst_2:list):
+    def export_as_dic(self, action_lst_1: list, action_lst_2: list):
         return {
-            "power":{ i : self.nodes[i].power for i in range(1,len(self.nodes))},#是三元tuple
-            "owner":{ i : self.nodes[i].belong for i in range(1,len(self.nodes))},#是0or1
-            "edges":{ i : self.nodes[i].get_next() for i in range(1,len(self.nodes))},
+            "power": {i: self.nodes[i].power for i in range(1, len(self.nodes))},  # 是三元tuple
+            "owner": {i: self.nodes[i].belong for i in range(1, len(self.nodes))},  # 是0or1
+            "edges": {i: self.nodes[i].get_next() for i in range(1, len(self.nodes))},
             # 存储连接的其他节点信息,示例:{1:1.2, 2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
-            "limit":{ i : self.nodes[i].power_limit for i in range(1,len(self.nodes))},#是float
-            "spawn_rate":{ i : self.nodes[i].spawn_rate for i in range(1,len(self.nodes))},#是float
-            "casualty_rate":{ i : self.nodes[i].casualty_rate for i in range(1,len(self.nodes))},#是float
-            "xy": g_map_xy,#地图每个节点可视化的坐标
+            "limit": {i: self.nodes[i].power_limit for i in range(1, len(self.nodes))},  # 是float
+            "spawn_rate": {i: self.nodes[i].spawn_rate for i in range(1, len(self.nodes))},  # 是float
+            "casualty_rate": {i: self.nodes[i].casualty_rate for i in range(1, len(self.nodes))},  # 是float
+            "xy": g_map_xy,  # 地图每个节点可视化的坐标
             "actions": {
-                1:action_lst_1,#三元元组的列表
-                2:action_lst_2
+                1: action_lst_1,  # 三元元组的列表
+                2: action_lst_2
             }
         }

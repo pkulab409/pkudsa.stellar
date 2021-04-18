@@ -1,7 +1,9 @@
-from contextlib import contextmanager
-import threading
 import _thread
+import threading
+from contextlib import contextmanager
+
 from GameException import TimeoutException
+
 
 @contextmanager
 def time_limit(seconds, msg=''):

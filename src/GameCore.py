@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Optional, Tuple, Any
 from GameMap import GameMap
-from TImeLimit import time_limit
+from TimeLimit import time_limit
 import json
 # 重要约定！！！
 PLAYER_1 = 0
