@@ -1,8 +1,10 @@
 from copy import deepcopy
 from typing import Optional, Tuple, Any
+import json
+
 from GameMap import GameMap
 from TimeLimit import time_limit
-import json
+
 # 重要约定！！！
 PLAYER_1 = 0
 PLAYER_2 = 1
@@ -10,18 +12,14 @@ PLAYER_2 = 1
 
 class Game:
     def __init__(self, filename1: str, filename2: str, max_time: float, max_turn: int, map_args: dict):
-        """
-        player's python file should include a function which looks like
+        """初始化一局游戏，具体规则请参见文档（文档组加油！
 
-        player_func(map: GameMap) -> [Tuple[int, int, float].....]
-
-        when illegal moves are given, player would be considered to make no moves
-
-        :param filename1: player 1's python file
-        :param filename2: player 2's python file
-        :param max_time: time limitation in seconds
-        :param max_turn: maximum turn numbers
-        :param map_args: game map's initialization parameters
+        Args:
+            filename1 (str): 玩家1的脚本
+            filename2 (str): 玩家2的脚本目录
+            max_time (float): 单步的最大思考时间
+            max_turn (int): 允许进行的最大回合数
+            map_args (dict): 包含地图配置的字典
         """
         self.__max_time = max_time
         self.__map = GameMap(map_args)
@@ -29,6 +27,7 @@ class Game:
         self.__game_end = False
         self.__max_turn = max_turn
         self.__history_map = [self.__map.export_as_dic([],[])]#开局的地图也要记录
+
         try:
             self.player_func1 = __import__(filename1).player_func
         except:
@@ -47,6 +46,8 @@ class Game:
                 self.__game_end = True
 
     def next_step(self):
+        """这里是对局面进行一次更新，询问两方玩家获得actionList，然后调用update()
+        """
         map_info1 = deepcopy(self.__map)
         map_info2 = deepcopy(self.__map)
         try:
@@ -69,11 +70,11 @@ class Game:
         # 历史地图字典，存入列表
         self.__history_map.append(self.__map.export_as_dic(player1_actions,player2_actions))
 
-        
     def run(self):
-        """
+        """这是运行接口，将返回胜利者
 
-        :return: 'player1', 'player2' or None if there is no winner
+        Returns:
+            str: 胜利者
         """
         for turn in range(self.__max_turn):
             self.next_step()

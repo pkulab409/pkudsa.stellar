@@ -13,6 +13,12 @@ def player_func_unused1(x, y):
 
 
 def player_func_unused2(x, y):  # for testing manually only
+    ##  very important:
+#   测试时输入的样例规定:
+#    1 2 30
+#    1 3 40
+#    qaq
+#    返回:[(1,2,30.0),(1,3,40.0)]
     result = []
     print('请分行输入操作,三个数用空格隔开,示例：2 5 80 输入任何字母或非法格式以结束输入:')
     try:
