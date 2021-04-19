@@ -41,52 +41,103 @@ class Node:
     def number(self):
         return self.__number
 
-    def set_connection(self, node_number, travel_cost):
-        self.__nextinfo[node_number] = travel_cost  # 添加连接的节点
-
-    def get_next(self):  # 返回所有连接的节点编号
-        lst = []
-        for number in self.__nextinfo.keys():
-            lst.append(number)
-        return lst
-
-    def get_nextCost(self, next_):
-        return self.__nextinfo[next_]
+    @property
+    def power(self):
+        return self.__power
 
     @property
-    def belong(self):  # int, -1, 0, or 1
+    def belong(self):
         return self.__belong
-
-    def change_owner(self, owner: int):
-        self.__belong = owner
 
     @property
     def spawn_rate(self):
         return self.__spawn_rate
 
     @property
-    def casualty_rate(self):
-        return self.__casualty_rate
-
-    @property
     def power_limit(self):
         return self.__power_limit
 
-    @property
-    def power(self):
-        return self.__power
+    def set_connection(self, nodeNumber, travelCost):
+        """设置与当前节点连接的节点，和行进到连接节点的过路费
+
+        Args:
+            node_number (int): 连接的节点\n
+            travel_cost (float): 过路费\n
+
+        Raises:
+            RuntimeError: nodeNumber must be int\n
+            RuntimeError: travelCost must be float\n
+        """
+        if not isinstance(nodeNumber, int):
+            raise RuntimeError('node_number must be int')
+        if not isinstance(travelCost, float):
+            raise RuntimeError('travel_cost must be float')
+        self.__nextinfo[nodeNumber] = travelCost
+
+    def get_next(self):
+        """用于获取当前节点可以通向的节点编号
+
+        Returns:
+            list: 当前节点可以通向的节点编号的列表
+        """
+        lst = []
+        for number in self.__nextinfo.keys():
+            lst.append(number)
+        return lst
+
+    def get_nextCost(self, next_):
+        """用于获取当前节点与目标节点之间的过路费
+
+        Args:
+            next_ (int): 目标节点编号
+
+        Raises:
+            RuntimeError: next_ must have connection with node
+
+        Returns:
+            float: 过路费
+        """
+        if next_ not in self.__nextinfo.keys():
+            raise RuntimeError('next_ must have connection with node')
+        return self.__nextinfo[next_]
+
 
     def set_power(self, p):
-        # 这里需要写判断p输入是否合法的语句，暂时空着
+        """用于设置当前节点的战力情况
+
+        Args:
+            p (list): 包含双方战力的列表
+
+        Raises:
+            RuntimeError: invalid input type list
+            RuntimeError: power must be float
+        """
+        if not isinstance(p, list):
+            raise RuntimeError('invalid input type list')
+        if list(map(type, p)) != [float, float]:
+            raise RuntimeError('power must be float')
         self.__power = p
+        if self.power[0] < self.power[1]:
+            self.belong == 1
+        elif self.power[0] > self.power[1]:
+            self.belong == 1
+        else:
+            self.belong == -1
 
     def combatInNode(self):
+        """当前节点内部进行战斗
+
+            战斗规则：
+
+            战斗将在一回合内完成并决出胜者，胜者会又有当前节点的归属，胜者一方的战力会使用calculatePower()计算，也就是(winnerPower ** 2 - loserPower ** 2) ** 0.5，失败一方的战力会清零
+        """
+        def calculatePower(winnerPower, loserPower):
+            return (winnerPower ** 2 - loserPower ** 2) ** 0.5
         if self.power[0] < self.power[1]:
-            self.set_power([0, (self.power[1] ** 2 - self.power[0] ** 2) ** 0.5])
-            self.change_owner(1)
+            self.set_power([0, calculatePower(self.power[1], self.power[0])])
         elif self.power[0] > self.power[1]:
-            self.set_power([(self.power[0] ** 2 - self.power[1] ** 2) ** 0.5, 0])
-            self.change_owner(0)
+            self.set_power([calculatePower(self.power[0], self.power[1]), 0])
         else:
             self.set_power([0, 0])
-            self.change_owner(-1)
+
+
