@@ -114,15 +114,15 @@ class Node:
         """
         if not isinstance(p, list):
             raise RuntimeError('invalid input type list')
-        if list(map(type, p)) != [float, float]:
-            raise RuntimeError('power must be float')
+        # if list(map(type, p)) != [float, float]:
+        #     raise RuntimeError('power must be float')
         self.__power = p
         if self.power[0] < self.power[1]:
-            self.belong == 1
+            self.__belong = 1
         elif self.power[0] > self.power[1]:
-            self.belong == 1
+            self.__belong = 0
         else:
-            self.belong == -1
+            self.__belong = -1
 
     def combatInNode(self):
         """当前节点内部进行战斗
@@ -134,10 +134,11 @@ class Node:
         def calculatePower(winnerPower, loserPower):
             return (winnerPower ** 2 - loserPower ** 2) ** 0.5
         if self.power[0] < self.power[1]:
-            self.set_power([0, calculatePower(self.power[1], self.power[0])])
+            self.set_power([0.0, calculatePower(self.power[1], self.power[0])])
         elif self.power[0] > self.power[1]:
-            self.set_power([calculatePower(self.power[0], self.power[1]), 0])
+            self.set_power([calculatePower(self.power[0], self.power[1]), 0.0])
         else:
-            self.set_power([0, 0])
+            self.set_power([0.0, 0.0])
+
 
 
