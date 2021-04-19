@@ -8,10 +8,8 @@ PLAYER_2 = 1
 
 class GameMap:
     def __init__(self, design: dict):  # 由于地图是固定的，因此init不需要参数。
-        self.__nodes = [Node(i) for i in range(len(design) + 1)]
-        self.nodes[1].change_owner(0)
+        self.nodes = [Node(i) for i in range(len(design) + 1)]
         self.nodes[1].set_power([100, 0])
-        self.nodes[len(design)].change_owner(1)
         self.nodes[len(design)].set_power([0, 100])
 
         for number in design.keys():
@@ -21,7 +19,7 @@ class GameMap:
 
     def __repr__(self):  # 方便测试时打印地图
         ans = []
-        for i in self.nodes[1::]:
+        for i in self.nodes[1:]:
             ans.append(repr(i))
         return "\n".join(ans) + "\n"
 
