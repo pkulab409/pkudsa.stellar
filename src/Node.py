@@ -1,20 +1,38 @@
 class Node:
-    def __init__(self, number, spawn_rate=0.01, casualty_rate=0, belong=-1, power_limit=100):
-        self.__number = number  # 节点的编号
-        self.__spawn_rate = spawn_rate  # 节点自己生产的速率
-        self.__casualty_rate = casualty_rate  # 战损比，定义不明，总之与战斗有关
-        self.__power_limit = power_limit  # 允许的无惩罚兵力上限
-        self.__nextinfo = {}
-        # 存储连接的其他节点信息,示例:{1:1.2,2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
+    def __init__(self, number, spawn_rate=0.01, belong=-1, power_limit=100):
+        """生成一个游戏节点，初始化并存储相关信息。
 
-        self.__power = [0, 0]  # 当前的兵力数列表，分别代表:player_1,player_2
-        self.__belong = belong  # 归属于哪个势力
+        number: 节点的编号，从1开始\n
+        belong: 归属于哪个势力 {-1: 中立, 0:player1 , 1:player2}\n
+        power: 当前的兵力数列表 [player1, player2]\n
+        spawn_rate: 节点产兵的速率, 产兵规则参见GameMap().__natality()\n
+        power_limit: 允许的单个节点无惩罚兵力上限\n
+        nextinfo: 存储与其他节点的联系 {节点编号: 过路费...}\n
+
+        Args:
+            number (int): 节点的编号\n
+            spawn_rate (float, optional): 节点产兵的速率. Defaults to 0.01.\n
+            belong (int, optional): 节点归属的势力. Defaults to -1.\n
+            power_limit (int, optional): 允许的单个节点无惩罚兵力上限. Defaults to 100.
+        """
+        self.__number = number
+        self.__power = [0, 0]
+        self.__belong = belong
+        self.__spawn_rate = spawn_rate
+        self.__power_limit = power_limit
+        self.__nextinfo = {}
 
     def __repr__(self):
+        """用来打印节点的信息
+
+        Returns:
+            str: 返回打印出的信息
+        """
         ans = "-----Node info: "
         ans += "Node number(ID): " + str(self.number) + "-----\n"
         ans += "Node owner: " + str(self.belong) + "\n"
-        ans += "Node power: player_1 " + str(self.power[0]) + ", player_2 " + str(self.power[1]) + "\n"
+        ans += "Node power: player1 " + \
+            str(self.power[0]) + ", player2 " + str(self.power[1]) + "\n"
         ans += "Node is connected to: "
         ans += repr(self.get_next()) + "\n"
         return ans
