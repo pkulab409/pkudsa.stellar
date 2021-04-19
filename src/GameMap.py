@@ -91,7 +91,7 @@ class GameMap:
             else:
                 sentPower[player_action[0]] += player_action[2]
         for i in sentPower:
-            if sentPower[i] >= self.__nodes[i].power[tmp_player_id] - 0.01:
+            if sentPower[i] >= self.__nodes[i].power[tmp_player_id]:
                 raise RuntimeError('Judgement!!! Invalid move:no enough power')
 
     def __move(self, tmp_player_id: int, player_action: tuple):
@@ -181,6 +181,9 @@ class GameMap:
         Args:
             player1_actions (list): 包含若干player1操作元组的列表
             player2_actions (list): 包含若干player2操作元组的列表
+
+        Returns:
+            list: 用于可视化的一个列表，里面包含三个字典
         """
         self.__judge(player1_actions, 0)
         self.__judge(player2_actions, 1)
@@ -190,8 +193,13 @@ class GameMap:
         for action in player2_actions:
             self.__move(1, action)
 
+        ans = [self.export_as_dic(player1_actions,player2_actions)]
+
         self.__combat()
+        ans.append(self.export_as_dic())
         self.__natality()
+        ans.append(self.export_as_dic())
+        return ans #返回一个三元列表，里面是代表本回合可视化的三个字典
 
     def end_early(self):
         """判断当前局面上是否有胜者出现
@@ -234,7 +242,7 @@ class GameMap:
         else:
             return None
 
-    def export_as_dic(self, action_lst_1: list, action_lst_2: list):
+    def export_as_dic(self, action_lst_1: list = [], action_lst_2: list = []):
         """将当前map返回为字典，适用于实现可视化的调试函数
 
         Args:
