@@ -8,13 +8,13 @@ PLAYER_2 = 1
 
 class GameMap:
     def __init__(self, design: dict):  # 由于地图是固定的，因此init不需要参数。
-        self.nodes = [Node(i) for i in range(len(design) + 1)]
-        self.nodes[1].set_power([100, 0])
-        self.nodes[len(design)].set_power([0, 100])
+        self.__nodes = [Node(i) for i in range(len(design) + 1)]
+        self.nodes[1].set_power([100.0, 0.0])
+        self.nodes[len(design)].set_power([0.0, 100.0])
 
         for number in design.keys():
             for nextnumber in design[number].keys():
-                self.__nodes[number].set_connection(nextnumber, design[number][nextnumber])
+                self.__nodes[number].set_connection(nextnumber, float(design[number][nextnumber]))
         # initialize according to the map design
 
     def __repr__(self):  # 方便测试时打印地图
@@ -233,7 +233,7 @@ class GameMap:
             # 存储连接的其他节点信息,示例:{1:1.2, 2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
             "limit": {i: self.nodes[i].power_limit for i in range(1, len(self.nodes))},  # 是float
             "spawn_rate": {i: self.nodes[i].spawn_rate for i in range(1, len(self.nodes))},  # 是float
-            "casualty_rate": {i: self.nodes[i].casualty_rate for i in range(1, len(self.nodes))},  # 是float
+            "casualty_rate": {i: 0 for i in range(1, len(self.nodes))},  # 是float
             "xy": g_map_xy,  # 地图每个节点可视化的坐标
             "actions": {
                 1: action_lst_1,  # 三元元组的列表
