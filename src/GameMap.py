@@ -96,8 +96,8 @@ class GameMap:
         self.nodes[start].power[tmp_player_id] -= power
 
         # 以根号作为兵力损耗的单位并且家手过路费
-        power -= round(power ** 0.5 + self.nodes[start].get_nextCost(end), 2)
-        power = 0.0 if power < 0.01 else power  # 兵力损耗至小于零时，相当于兵力为零
+        power -= power ** 0.5 + self.nodes[start].get_nextCost(end)
+        power = max(power, 0)  # 兵力损耗至小于零时，相当于兵力为零
         self.nodes[end].power[tmp_player_id] += power
 
     def __combat(self):
@@ -105,12 +105,11 @@ class GameMap:
         """
 
         def combat_inner(node: Node):
-
-            if node.power[0] <= node.power[1] - 0.01:
-                node.set_power([0, round((node.power[1] ** 2 - node.power[0] ** 2) ** 0.5, 2)])
+            if node.power[0] < node.power[1]:
+                node.set_power([0, (node.power[1] ** 2 - node.power[0] ** 2) ** 0.5])
                 node.change_owner(1)
-            elif node.power[0] >= node.power[1] + 0.01:
-                node.set_power([round((node.power[0] ** 2 - node.power[1] ** 2) ** 0.5, 2), 0])
+            elif node.power[0] > node.power[1]:
+                node.set_power([(node.power[0] ** 2 - node.power[1] ** 2) ** 0.5, 0])
                 node.change_owner(0)
             else:
                 node.set_power([0, 0])
@@ -155,27 +154,19 @@ class GameMap:
             new0 = n.power[0]
             new1 = n.power[1]  # 两个临时变量
             if n.belong == 0:
-                new0 = round(
-                    n.power[0] + n.spawn_rate * \
+                new0 = n.power[0] + n.spawn_rate * \
                     (n.power_limit - n.power[0]) * n.power[0]
-                    , 2)
                 if n.power[1] > n.power_limit:
-                    new1 = round(
-                        n.power[1] + n.spawn_rate * \
+                    new1 = n.power[1] + n.spawn_rate * \
                         (n.power_limit - n.power[1]) * n.power[1]
-                        , 2)
                 new0, new1 = max(new0, 0), max(new1, 0)
                 n.set_power([new0, new1])
             if n.belong == 1:
-                new1 = round(
-                    n.power[1] + n.spawn_rate * \
+                new1 = n.power[1] + n.spawn_rate * \
                     (n.power_limit - n.power[1]) * n.power[1]
-                    , 2)
                 if n.power[0] > n.power_limit:
-                    new0 = round(
-                        n.power[0] + n.spawn_rate * \
+                    new0 = n.power[0] + n.spawn_rate * \
                         (n.power_limit - n.power[0]) * n.power[0]
-                        , 2)
                 new0, new1 = max(new0, 0), max(new1, 0)
                 n.set_power([new0, new1])
 
