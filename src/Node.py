@@ -79,3 +79,14 @@ class Node:
     def set_power(self, p):
         # 这里需要写判断p输入是否合法的语句，暂时空着
         self.__power = p
+
+    def combatInNode(self):
+        if self.power[0] < self.power[1]:
+            self.set_power([0, (self.power[1] ** 2 - self.power[0] ** 2) ** 0.5])
+            self.change_owner(1)
+        elif self.power[0] > self.power[1]:
+            self.set_power([(self.power[0] ** 2 - self.power[1] ** 2) ** 0.5, 0])
+            self.change_owner(0)
+        else:
+            self.set_power([0, 0])
+            self.change_owner(-1)
