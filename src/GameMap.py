@@ -1,5 +1,6 @@
-from MapDesign import g_map_xy
+from MapDesign import g_design
 from Node import Node
+from config import POWER_LIMIT, INIT_POWER_1, INIT_POWER_2
 
 # 重要约定！！！
 PLAYER_1 = 0
@@ -7,7 +8,7 @@ PLAYER_2 = 1
 
 
 class GameMap:
-    def __init__(self, design: dict):  # 由于地图是固定的，因此init不需要参数。
+    def __init__(self, design: dict):
         """GameMap class的初始化，根据地图字典，生成地图。
 
             nodes存储了地图的所有节点，而具体数据存储在各个node中，详细数据请参见Node class
@@ -16,9 +17,10 @@ class GameMap:
         Args:
             design (dict): 地图文件中的字典
         """
-        self.__nodes = [Node(i) for i in range(len(design) + 1)]
-        self.nodes[1].set_power([100.0, 0.0])
-        self.nodes[len(design)].set_power([0.0, 100.0])
+        self.N = len(design) # 节点数，增加代码可读性
+        self.__nodes = [Node(i) for i in range(self.N+2)]
+        self.nodes[1].set_power(INIT_POWER_1, True)
+        self.nodes[self.N].set_power(INIT_POWER_2, True)
 
         for number in design.keys():
             for nextnumber in design[number].keys():
@@ -62,7 +64,7 @@ class GameMap:
         # 检查输入是否是list
         if not isinstance(player_actionlist, list):
             raise RuntimeError('Judgement!!! Invalid input type!')
-        sentPower = {}  # sentPOwer[i]代表每个节点派出去多少兵
+        sentPower = {}  # sentPower[i]代表每个节点派出去多少兵
         for player_action in player_actionlist:
             # 检测输入action是否是元组，并且长度为3
             if not isinstance(player_action, tuple):
@@ -77,9 +79,9 @@ class GameMap:
             if not isinstance(player_action[2], float):
                 raise RuntimeError("Judgement!!! Invalid input type! ")
             # 判断action是否越界操作
-            if player_action[2] < 0.01:
+            if player_action[2] <= 0:
                 raise RuntimeError("Judgement!!! Invalid input value(<=0)! ")
-            if player_action[0] <= 0 or player_action[0] >= len(self.nodes):
+            if player_action[0] < 1 or player_action[0] > self.N:
                 raise RuntimeError(
                     'Judgement!!! Invalid input target(out of range): %s' % str(player_action))
 
@@ -111,14 +113,14 @@ class GameMap:
         power = player_action[2]
         # 输入是否合法
         if not (isinstance(tmp_player_id, int) and isinstance(start, int) and isinstance(end, int) and
-                isinstance(power, float)):
+                (isinstance(power, float) or isinstance(power, int))):
             raise RuntimeError('invalid input type: %s' % str(player_action))
         # 派出兵力点不属于该玩家
         if self.nodes[start].belong != tmp_player_id:
             raise RuntimeError(
                 'invalid move: wrong basement: %s' % str(player_action))
         # power超过兵力上限
-        if self.nodes[start].power[tmp_player_id] <= power + 0.01:
+        if self.nodes[start].power[tmp_player_id] <= power:
             raise RuntimeError(
                 'invalid input value(too much): %s' % str(player_action))
         # 目标兵力节点与派出点不相连
@@ -127,13 +129,16 @@ class GameMap:
                 'invalid move: no connection: %s' % str(player_action))
 
         # 以下为行动主体函数
-
-        self.nodes[start].power[tmp_player_id] -= power
+        tmp_pw = list(self.nodes[start].power)
+        tmp_pw[tmp_player_id] -= power
+        self.nodes[start].set_power(tuple(tmp_pw), False)
 
         # 以根号作为兵力损耗的单位并且家手过路费
+        tmp_pw = list(self.nodes[end].power)
         power -= power ** 0.5 - self.nodes[start].get_nextCost(end)
         power = max(power, 0)  # 兵力损耗至小于零时，相当于兵力为零
-        self.nodes[end].power[tmp_player_id] += power
+        tmp_pw[tmp_player_id] += power
+        self.nodes[end].set_power(tuple(tmp_pw), False)
 
     def __combat(self):
         """调用每个节点的combatInNode()函数，完成战斗过程，战斗细节参见Node.combatInNode()函数
@@ -160,7 +165,7 @@ class GameMap:
                     new1 = n.power[1] + n.spawn_rate * \
                         (n.power_limit - n.power[1]) * n.power[1]
                 new0, new1 = max(new0, 0), max(new1, 0)
-                n.set_power([new0, new1])
+                n.set_power((new0, new1), False)
             if n.belong == 1:
                 new1 = n.power[1] + n.spawn_rate * \
                     (n.power_limit - n.power[1]) * n.power[1]
@@ -168,7 +173,7 @@ class GameMap:
                     new0 = n.power[0] + n.spawn_rate * \
                         (n.power_limit - n.power[0]) * n.power[0]
                 new0, new1 = max(new0, 0), max(new1, 0)
-                n.set_power([new0, new1])
+                n.set_power((new0, new1), False)
 
     def update(self, player1_actions, player2_actions):
         """这是用来更新地图的函数，将作用于所有的节点，逻辑是先judge，再move，再combat，再natality
@@ -194,9 +199,9 @@ class GameMap:
         Returns:
             str: ['draw': 平局, 'player1': player1获胜, 'player2':player2获胜 , None: 未结束]
         """
-        if self.nodes[1].belong == 1 and self.nodes[len(self.nodes) - 1].belong == 0:
+        if self.nodes[1].belong == 1 and self.nodes[self.N].belong == 0:
             return "draw"
-        if self.nodes[len(self.nodes) - 1].belong == 0:
+        if self.nodes[self.N].belong == 0:
             return "player1"
         if self.nodes[1].belong == 1:
             return "player2"
@@ -210,7 +215,7 @@ class GameMap:
             str: ['player1': player1获胜, 'player2':player2获胜 , None: 未结束]
         """
         n_node1, n_node2, n_army1, n_army2 = 0, 0, 0, 0  # 分别表示两位玩家的占领节点数量，以及节点内总兵力
-        for i in range(0, len(self.nodes)):
+        for i in range(1, self.N+1):
             if self.nodes[i].belong == 0:
                 n_node1 += 1
                 # .power中,[0]是玩家1的兵力,[1]是玩家2的兵力
@@ -241,16 +246,14 @@ class GameMap:
         """
         return {
             # 是三元tuple
-            "power": {i: self.nodes[i].power for i in range(1, len(self.nodes))},
+            "power": {i: self.nodes[i].power for i in range(1, self.N+1)},
             # 是0or1
-            "owner": {i: self.nodes[i].belong for i in range(1, len(self.nodes))},
-            "edges": {i: self.nodes[i].get_next() for i in range(1, len(self.nodes))},
+            "owner": {i: self.nodes[i].belong for i in range(1, self.N+1)},
             # 存储连接的其他节点信息,示例:{1:1.2, 2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
+            "edges": {i: self.nodes[i].get_next() for i in range(1, self.N+1)},
             # 是float
-            "limit": {i: self.nodes[i].power_limit for i in range(1, len(self.nodes))},
-            # 是float
-            "casualty_rate": {i: 0 for i in range(1, len(self.nodes))},
-            "xy": g_map_xy,  # 地图每个节点可视化的坐标
+            "limit": {i: self.nodes[i].power_limit for i in range(1, self.N+1)},
+            "xy": g_design["xy"],  # 地图每个节点可视化的坐标
             "actions": {
                 1: action_lst_1,  # 三元元组的列表
                 2: action_lst_2
