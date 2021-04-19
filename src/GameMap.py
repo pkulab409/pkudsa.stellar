@@ -103,20 +103,8 @@ class GameMap:
     def __combat(self):
         """第一部分为战斗过程，第二部分为战斗结算和归属变更
         """
-
-        def combat_inner(node: Node):
-            if node.power[0] < node.power[1]:
-                node.set_power([0, (node.power[1] ** 2 - node.power[0] ** 2) ** 0.5])
-                node.change_owner(1)
-            elif node.power[0] > node.power[1]:
-                node.set_power([(node.power[0] ** 2 - node.power[1] ** 2) ** 0.5, 0])
-                node.change_owner(0)
-            else:
-                node.set_power([0, 0])
-                node.change_owner(-1)
-
         for node in self.nodes:
-            combat_inner(node)
+            node.combatInNode()
 
     def __natality(self):
         """遍历每个节点将节点双方战力更改为增长或衰减后的战力
