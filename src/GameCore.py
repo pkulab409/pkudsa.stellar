@@ -28,7 +28,7 @@ class Game:
         self.__winner = None
         self.__game_end = False
         self.__max_turn = max_turn
-        self.__history_map = [self.__map.export_as_dic([],[])]#开局的地图也要记录
+        
         try:
             self.player_func1 = __import__(filename1).player_func
         except:
@@ -66,10 +66,7 @@ class Game:
             return
         self.__map.update(player1_actions, player2_actions)
 
-        # 历史地图字典，存入列表
-        self.__history_map.append(self.__map.export_as_dic(player1_actions,player2_actions))
-
-        
+    
     def run(self):
         """
 
@@ -95,4 +92,4 @@ class Game:
         return self.__winner
 
     def get_history(self):
-        return self.__history_map
+        return self.__map.history

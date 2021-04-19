@@ -14,7 +14,7 @@ cnt = [0, 0]
 #    返回:[(1,2,30.0),(1,3,40.0)]
 
 if __name__ == '__main__':
-    for i in range(50):
+    for i in range(5):
         g = Game('player1', 'player2', MAX_TIME, MAX_TURN, g_design)
 
         fuck = g.run()

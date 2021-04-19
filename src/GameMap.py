@@ -19,11 +19,11 @@ class GameMap:
         self.__nodes = [Node(i) for i in range(len(design) + 1)]
         self.nodes[1].set_power([100.0, 0.0])
         self.nodes[len(design)].set_power([0.0, 100.0])
-
         for number in design.keys():
             for nextnumber in design[number].keys():
                 self.__nodes[number].set_connection(
                     nextnumber, float(design[number][nextnumber]))
+        self.history = [self.export_as_dic([], [])]
 
     def __repr__(self):
         """用于打印地图信息，面向调试
@@ -186,8 +186,10 @@ class GameMap:
             self.__move(1, action)
 
         self.__combat()
+        self.history.append(self.export_as_dic(player1_actions, player2_actions))
         self.__natality()
-
+        self.history.append(self.export_as_dic([], []))
+        
     def end_early(self):
         """判断当前局面上是否有胜者出现
 
@@ -241,7 +243,7 @@ class GameMap:
         """
         return {
             # 是三元tuple
-            "power": {i: self.nodes[i].power for i in range(1, len(self.nodes))},
+            "power": {i: self.nodes[i].power.copy() for i in range(1, len(self.nodes))},
             # 是0or1
             "owner": {i: self.nodes[i].belong for i in range(1, len(self.nodes))},
             "edges": {i: self.nodes[i].get_next() for i in range(1, len(self.nodes))},
