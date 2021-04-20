@@ -2,14 +2,13 @@ import json
 
 from GameCore import Game
 from MapDesign import g_design
+from config import MAX_TIME, MAX_TURN
 
-MAX_TIME = 999999
-MAX_TURN = 100
 cnt = [0, 0]
 
 if __name__ == '__main__':
     for i in range(50):
-        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, g_design)
+        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, g_design['design'])
 
         fuck = g.run()
         if fuck == "player1":

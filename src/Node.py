@@ -1,5 +1,7 @@
+from config import SPAWN_RATE,POWER_LIMIT
+
 class Node:
-    def __init__(self, number, spawn_rate=0.01, belong=-1, power_limit=100):
+    def __init__(self, number, spawn_rate=SPAWN_RATE, belong=-1, power_limit=POWER_LIMIT):
         """生成一个游戏节点，初始化并存储相关信息。
 
         number: 节点的编号，从1开始\n
@@ -16,7 +18,7 @@ class Node:
             power_limit (int, optional): 允许的单个节点无惩罚兵力上限. Defaults to 100.
         """
         self.__number = number
-        self.__power = [0, 0]
+        self.__power = (0, 0) # 重要！！！power现在起是元组类型！！！
         self.__belong = belong
         self.__spawn_rate = spawn_rate
         self.__power_limit = power_limit
@@ -102,7 +104,7 @@ class Node:
         return self.__nextinfo[next_]
 
 
-    def set_power(self, p, needJudge = True):
+    def set_power(self, p:tuple, needJudge:bool):
         """用于设置当前节点的战力情况
 
         Args:
@@ -111,10 +113,10 @@ class Node:
 
         Raises:
             RuntimeError: invalid input type list
-            RuntimeError: power must be float.
+            RuntimeError: power must be float tuple.
         """
-        if not isinstance(p, list):
-            raise RuntimeError('invalid input type list')
+        if not isinstance(p, tuple):
+            raise RuntimeError('invalid input type tuple')
         # if list(map(type, p)) != [float, float]:
         #     raise RuntimeError('power must be float')
         self.__power = p
@@ -136,8 +138,8 @@ class Node:
         def calculatePower(winnerPower, loserPower):
             return (winnerPower ** 2 - loserPower ** 2) ** 0.5
         if self.power[0] < self.power[1]:
-            self.set_power([0.0, calculatePower(self.power[1], self.power[0])])
+            self.set_power((0.0, calculatePower(self.power[1], self.power[0])), True)
         elif self.power[0] > self.power[1]:
-            self.set_power([calculatePower(self.power[0], self.power[1]), 0.0])
+            self.set_power((calculatePower(self.power[0], self.power[1]), 0.0), True)
         else:
-            self.set_power([0.0, 0.0])
+            self.set_power((0.0, 0.0), True)

@@ -4,6 +4,7 @@ import json
 
 from GameMap import GameMap
 from TimeLimit import time_limit
+import config
 
 # 重要约定！！！
 PLAYER_1 = 0
@@ -26,8 +27,7 @@ class Game:
         self.__winner = None
         self.__game_end = False
         self.__max_turn = max_turn
-        self.__history_map = [self.__map.export_as_dic([],[])]#开局的地图也要记录
-
+        self.__history_map = [self.__map.update([], [])]#开局的地图也要记录
         try:
             self.player_func1 = __import__(filename1).player_func
         except:
@@ -65,10 +65,11 @@ class Game:
             player2_actions = []
         if self.__game_end:
             return
-        self.__map.update(player1_actions, player2_actions)
 
         # 历史地图字典，存入列表
-        self.__history_map.append(self.__map.export_as_dic(player1_actions,player2_actions))
+        self.__history_map.append(
+            self.__map.update(player1_actions, player2_actions)
+        )
 
     def run(self):
         """这是运行接口，将返回胜利者
