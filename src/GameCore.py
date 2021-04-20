@@ -50,13 +50,17 @@ class Game:
         """
         map_info1 = deepcopy(self.__map)
         map_info2 = deepcopy(self.__map)
-        try:
+        if False: # 测试代码，测试的时候改成False
+            try:
+                with time_limit(self.__max_time, "player1"):
+                    player1_actions = self.player_func1(map_info1,0)
+            except Exception:
+                print("Player func 1 error!")
+                player1_actions = []
+        else:
             with time_limit(self.__max_time, "player1"):
                 player1_actions = self.player_func1(map_info1,0)
-        except Exception:
-            print("Player func 1 error!")
             # 这里是否应该捕捉到异常之后直接判负?
-            player1_actions = []
         try:
             with time_limit(self.__max_time, "player2"):
                 player2_actions = self.player_func2(map_info2,1)
@@ -78,13 +82,13 @@ class Game:
             str: 胜利者
         """
         for turn in range(self.__max_turn):
+            if self.__game_end:
+                break
             self.next_step()
 
             #print(self.__map) # 测试代码，记得删
             #print("___________________________________________________________________________")
 
-            if self.__game_end:
-                break
             end_early = self.__map.end_early()
             if end_early is not None:
                 self.__winner = end_early

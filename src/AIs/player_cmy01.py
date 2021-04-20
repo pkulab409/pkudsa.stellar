@@ -102,7 +102,7 @@ def noob_littleAI(map_info: GameMap, player_id: int):
                 if all_clear:
                     j=max(node.get_next()) if player_id==0 else min(node.get_next())
                     nextnode=nodes[j]
-                    actions.append((node.number,nextnode.number,node.power[player_id]-10))
+                    actions.append((node.number,nextnode.number,node.power[player_id]*3/4))
 
                     
                         
