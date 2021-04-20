@@ -77,4 +77,3 @@ def player_func_random2(map_info: GameMap, player_id: int):
 
 
 player_func = AI_made_by_xhzgenius
-

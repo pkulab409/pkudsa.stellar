@@ -8,10 +8,9 @@ from DesignGenerator import DesignGenerator
 cnt = [0, 0]
 
 if __name__ == '__main__':
-    for i in range(1):
+    for i in range(10):
         dg = DesignGenerator(bridge=0.8, branch=(2, 4), depth=3)
-        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, {'design': dg.generate()})
-
+        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, dg.generate())
 
         fuck = g.run()
         if fuck == "player1":
