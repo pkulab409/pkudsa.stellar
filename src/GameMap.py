@@ -27,7 +27,6 @@ class GameMap:
             for nextnumber in design[number].keys():
                 self.__nodes[number].set_connection(
                     nextnumber, float(design[number][nextnumber]))
-        self.history = [self.export_as_dic([], [])]
 
     def __repr__(self):
         """用于打印地图信息，面向调试
