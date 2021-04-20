@@ -27,7 +27,6 @@ class GameMap:
             for nextnumber in design[number].keys():
                 self.__nodes[number].set_connection(
                     nextnumber, float(design[number][nextnumber]))
-        self.history = [self.export_as_dic([], [])]
 
     def __repr__(self):
         """用于打印地图信息，面向调试
@@ -258,7 +257,7 @@ class GameMap:
         return {
             # 是三元tuple
 
-            "power": {i: self.nodes[i].power.copy() for i in range(1, len(self.nodes))},
+            "power": {i: self.nodes[i].power for i in range(1, len(self.nodes))},
 
             # 是0or1
             "owner": {i: self.nodes[i].belong for i in range(1, self.N+1)},
