@@ -20,13 +20,13 @@ class GameMap:
         self.design = design
         design = design['design']
         self.N = len(design) # 节点数，增加代码可读性
-        self.__nodes = [Node(i) for i in range(self.N+2)]
+        self.nodes = [Node(i) for i in range(self.N+2)]
         self.nodes[1].set_power(INIT_POWER_1, True)
         self.nodes[self.N].set_power(INIT_POWER_2, True)
 
         for number in design.keys():
             for nextnumber in design[number].keys():
-                self.__nodes[number].set_connection(
+                self.nodes[number].set_connection(
                     nextnumber, float(design[number][nextnumber]))
 
     def __repr__(self):
@@ -40,9 +40,6 @@ class GameMap:
             ans.append(repr(i))
         return "\n".join(ans) + "\n"
 
-    @property
-    def nodes(self):
-        return self.__nodes
 
     def __judge(self, player_actionlist: list, tmp_player_id: int):
         """此函数用于判断当回合派遣兵力是否合法
@@ -78,7 +75,7 @@ class GameMap:
                 raise RuntimeError("Judgement!!! Invalid input type! ")
             if not isinstance(player_action[1], int):
                 raise RuntimeError("Judgement!!! Invalid input type! ")
-            if not isinstance(player_action[2], float):
+            if not (isinstance(player_action[2], float) or isinstance(player_action[2], int)):
                 raise RuntimeError("Judgement!!! Invalid input type! ")
             # 判断action是否越界操作
             if player_action[2] <= 0:
@@ -93,7 +90,7 @@ class GameMap:
             else:
                 sentPower[player_action[0]] += player_action[2]
         for i in sentPower:
-            if sentPower[i] >= self.__nodes[i].power[tmp_player_id]:
+            if sentPower[i] >= self.nodes[i].power[tmp_player_id]:
                 raise RuntimeError('Judgement!!! Invalid move:no enough power')
 
     def __move(self, tmp_player_id: int, player_action: tuple):

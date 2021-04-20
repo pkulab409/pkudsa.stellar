@@ -2,12 +2,15 @@ from random import randint as rd
 
 from GameMap import GameMap
 
+from AIs.player_cmy01 import noob_littleAI
+
 # 重要约定！！！
 PLAYER_1 = 0
 PLAYER_2 = 1
 
+player_func = noob_littleAI
 
-def player_func(map_info: GameMap, player_id: int):
+def player_func_un(map_info: GameMap, player_id: int):
     ACTIONS = []
     tmp_left = [i.power[player_id] for i in map_info.nodes]
 

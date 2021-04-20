@@ -10,7 +10,7 @@ cnt = [0, 0]
 if __name__ == '__main__':
     for i in range(1):
         dg = DesignGenerator(bridge=0.8, branch=(2, 4), depth=3)
-        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, {'design': dg.generate()})
+        g = Game('AIs.player1', 'AIs.player2', MAX_TIME, MAX_TURN, {'design': dg.generate()})
 
 
         fuck = g.run()
@@ -18,6 +18,9 @@ if __name__ == '__main__':
             cnt[0] += 1
         elif fuck == "player2":
             cnt[1] += 1
+            # 导出地图，给可视化
+            with open("output_lose.json", "w") as _f:
+                json.dump(g.get_history(), _f)
         print("now", cnt[0], cnt[1])
     print(cnt)
 

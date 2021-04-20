@@ -103,7 +103,7 @@ class Node:
             raise RuntimeError('next_ must have connection with node')
         return self.__nextinfo[next_]
 
-
+    
     def set_power(self, p:tuple, needJudge:bool):
         """用于设置当前节点的战力情况
 
