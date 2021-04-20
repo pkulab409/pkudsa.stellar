@@ -31,6 +31,7 @@ class DesignGenerator:
 
         front_nodes = len(depth_nodes[-1])
         back_nodes = total_nodes - front_nodes
+
         total_nodes = 2 * back_nodes + front_nodes
         for index in range(1, back_nodes + 1):
             design[total_nodes - index + 1] = {}
@@ -40,3 +41,4 @@ class DesignGenerator:
                     design[total_nodes - node + 1][total_nodes - index + 1] = 0
 
         return design
+
