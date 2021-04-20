@@ -257,7 +257,7 @@ class GameMap:
         return {
             # 是三元tuple
 
-            "power": {i: self.nodes[i].power.copy() for i in range(1, len(self.nodes))},
+            "power": {i: self.nodes[i].power for i in range(1, len(self.nodes))},
 
             # 是0or1
             "owner": {i: self.nodes[i].belong for i in range(1, self.N+1)},
