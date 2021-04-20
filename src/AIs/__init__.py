@@ -1,1 +1,2 @@
-from AIs import player1, player2
+from AIs.player1 import *
+#from AIs.player2 import *

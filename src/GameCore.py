@@ -27,19 +27,16 @@ class Game:
         self.__winner = None
         self.__game_end = False
         self.__max_turn = max_turn
-
         self.__history_map = [self.__map.update([], [])]#开局的地图也要记录
-
         try:
-
-            exec("self.player_func1 = __import__('AIs.{}').".format(filename1) + filename1 + '.player_func')
+            self.player_func1 = __import__(filename1).player_func
         except:
             # if function is not found, the opposite wins
             self.__winner = 'player2'
             self.__game_end = True
 
         try:
-            exec("self.player_func2 = __import__('AIs.{}').".format(filename2) + filename2 + '.player_func')
+            self.player_func2 = __import__(filename2).player_func
         except:
             if self.__game_end:
                 # both players fail to write a correct function, no one wins
@@ -73,7 +70,7 @@ class Game:
         if self.__game_end:
             return
 
-
+        # 历史地图字典，存入列表
         self.__history_map.append(
             self.__map.update(player1_actions, player2_actions)
         )
