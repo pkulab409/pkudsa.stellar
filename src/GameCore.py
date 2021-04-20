@@ -31,14 +31,15 @@ class Game:
         self.__history_map = [self.__map.update([], [])]#开局的地图也要记录
 
         try:
-            self.player_func1 = __import__(filename1).player_func
+
+            exec("self.player_func1 = __import__('AIs.{}').".format(filename1) + filename1 + '.player_func')
         except:
             # if function is not found, the opposite wins
             self.__winner = 'player2'
             self.__game_end = True
 
         try:
-            self.player_func2 = __import__(filename2).player_func
+            exec("self.player_func2 = __import__('AIs.{}').".format(filename2) + filename2 + '.player_func')
         except:
             if self.__game_end:
                 # both players fail to write a correct function, no one wins
