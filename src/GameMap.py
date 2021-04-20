@@ -154,6 +154,8 @@ class GameMap:
 
             对于AI而言，最大收益显然是power = power_limit / 2
         """
+
+        
         for n in self.nodes:
             new0 = n.power[0]
             new1 = n.power[1]  # 两个临时变量
