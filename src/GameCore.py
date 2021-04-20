@@ -99,4 +99,4 @@ class Game:
         return self.__winner
 
     def get_history(self):
-        return self.__map.history
+        return self.__history_map
