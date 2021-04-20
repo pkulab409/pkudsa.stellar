@@ -76,4 +76,4 @@ def player_func_random2(map_info: GameMap, player_id: int):
     return actions
 
 
-player_func = AI_made_by_xhzgenius
+player_func = player_func_random1

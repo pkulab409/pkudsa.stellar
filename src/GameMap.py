@@ -1,6 +1,6 @@
-from MapDesign import g_design
 from Node import Node
 from config import POWER_LIMIT, INIT_POWER_1, INIT_POWER_2
+from typing import Dict
 
 # 重要约定！！！
 PLAYER_1 = 0
@@ -8,7 +8,7 @@ PLAYER_2 = 1
 
 
 class GameMap:
-    def __init__(self, design: dict):
+    def __init__(self, design: Dict):
         """GameMap class的初始化，根据地图字典，生成地图。
 
             nodes存储了地图的所有节点，而具体数据存储在各个node中，详细数据请参见Node class
@@ -17,6 +17,8 @@ class GameMap:
         Args:
             design (dict): 地图文件中的字典
         """
+        self.design = design
+        design = design['design']
         self.N = len(design) # 节点数，增加代码可读性
         self.nodes = [Node(i) for i in range(self.N+2)]
         self.nodes[1].set_power(INIT_POWER_1, True)
@@ -193,6 +195,7 @@ class GameMap:
         ans = [self.export_as_dic(player1_actions,player2_actions)]
 
         self.__combat()
+
         ans.append(self.export_as_dic())
         self.__natality()
         ans.append(self.export_as_dic())
@@ -249,18 +252,24 @@ class GameMap:
         Returns:
             dict: 包含map信息的字典
         """
-        return {
+        result = {
             # 是三元tuple
-            "power": {i: self.nodes[i].power for i in range(1, self.N+1)},
+
+            "power": {i: self.nodes[i].power for i in range(1, len(self.nodes))},
+
             # 是0or1
             "owner": {i: self.nodes[i].belong for i in range(1, self.N+1)},
             # 存储连接的其他节点信息,示例:{1:1.2, 2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
             "edges": {i: self.nodes[i].get_next() for i in range(1, self.N+1)},
             # 是float
             "limit": {i: self.nodes[i].power_limit for i in range(1, self.N+1)},
-            "xy": g_design["xy"],  # 地图每个节点可视化的坐标
+            #"xy": g_design["xy"],  # 地图每个节点可视化的坐标
             "actions": {
                 1: action_lst_1,  # 三元元组的列表
                 2: action_lst_2
             }
         }
+        if 'xy' in self.design:
+            result['xy'] = self.design['xy']
+        return result
+        
