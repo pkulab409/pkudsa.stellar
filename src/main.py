@@ -3,13 +3,14 @@ import json
 from GameCore import Game
 from MapDesign import g_design
 from config import MAX_TIME, MAX_TURN
+from DesignGenerator import DesignGenerator
 
 cnt = [0, 0]
 
 if __name__ == '__main__':
-
-    for i in range(5):
-        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, g_design['design'])
+    for i in range(1):
+        dg = DesignGenerator(bridge=0.8, branch=(2, 4), depth=3)
+        g = Game('player1', 'player2', MAX_TIME, MAX_TURN, {'design': dg.generate()})
 
 
         fuck = g.run()
