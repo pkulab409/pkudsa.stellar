@@ -17,6 +17,7 @@ class GameMap:
         Args:
             design (dict): 地图文件中的字典
         """
+
         self.N = len(design) # 节点数，增加代码可读性
         self.__nodes = [Node(i) for i in range(self.N+2)]
         self.nodes[1].set_power(INIT_POWER_1, True)
@@ -26,6 +27,7 @@ class GameMap:
             for nextnumber in design[number].keys():
                 self.__nodes[number].set_connection(
                     nextnumber, float(design[number][nextnumber]))
+        self.history = [self.export_as_dic([], [])]
 
     def __repr__(self):
         """用于打印地图信息，面向调试
@@ -196,6 +198,7 @@ class GameMap:
         ans = [self.export_as_dic(player1_actions,player2_actions)]
 
         self.__combat()
+
         ans.append(self.export_as_dic())
         self.__natality()
         ans.append(self.export_as_dic())
@@ -254,7 +257,9 @@ class GameMap:
         """
         return {
             # 是三元tuple
-            "power": {i: self.nodes[i].power for i in range(1, self.N+1)},
+
+            "power": {i: self.nodes[i].power.copy() for i in range(1, len(self.nodes))},
+
             # 是0or1
             "owner": {i: self.nodes[i].belong for i in range(1, self.N+1)},
             # 存储连接的其他节点信息,示例:{1:1.2, 2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
