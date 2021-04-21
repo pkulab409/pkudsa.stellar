@@ -1,4 +1,4 @@
-from random import random
+from random import random,choices
 
 def Generate_Hexagon(a: int, p_node: float = 0.1, p_edge: float = 0.1):
     result = Generate_Hexagon_Try(a,p_node,p_edge)
@@ -53,6 +53,7 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
                     design[j][i] = 0
                     design[N+1-i][N+1-j] = 0 # 中心对称
                     design[N+1-j][N+1-i] = 0
+            
     
     # dfs 判断连通性
     visited = [False for i in range(N+1)]
@@ -66,6 +67,10 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
     for i in range(1,N+1):
         if visited[i]==False:
             print("Oh shit. This map is not connected. \nRegenerating. ")
+            return -1 # 生成失败
+    for i in range(1,N+1):
+        if len(design[i])<2: # 陈老师说，每个节点至少2度
+            print("Oh no, one of the nodes has only one edge. \nRegenerating. ")
             return -1 # 生成失败
 
 
