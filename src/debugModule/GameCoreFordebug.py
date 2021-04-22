@@ -120,9 +120,9 @@ class GameDebug:
             ### print(self.__history_map)
             for i in self.__history_map["map"]["edges"].keys():
                 ans += 'Node{} Power: '.format(str(i))
-                ans += str(history[0][2]['power'][i]) + '------>'
-                ans += str(history[1][0]['power'][i]) + '------>'
-                ans += str(history[1][2]['power'][i]) + '\n'
+                ans += str(history["history"][0]['power'][i]) + '------>'
+                ans += str(history["history"][1]['power'][i]) + '------>'
+                ans += str(history["history"][2]['power'][i]) + '\n'
             print(ans)
 
             end_early = self.__map.end_early()
@@ -163,7 +163,6 @@ class GameDebug:
         return self.__history_map
 
     def historyDebug(self):
-        history = self.get_history()["history"]
-        if len(history) > 2:
-            return history[len(history) - 2:]
-        return history
+        map_info = self.get_history()
+        map_info["history"] = map_info["history"][-1]
+        return map_info
