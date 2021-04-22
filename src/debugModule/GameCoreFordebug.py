@@ -30,18 +30,23 @@ class GameDebug:
         self.__winner = None
         self.__game_end = False
         self.__max_turn = max_turn
+        self.__history_map = {
+            "map": self.__map.export_map_as_dic(), 
+            "player_name": {0: filename1, 1: filename2, -1: "No player(draw)", None: "玩家函数错误"}, 
+            "result": "游戏还没结束。",
+            "history": [self.__map.update([], [])]
+        }#开局的地图也要记录
 
-        self.__history_map = [self.__map.update([], [])]#开局的地图也要记录
 
         try:
-             exec("self.player_func1 = __import__('AIs.{}').".format(filename1) + filename1 + '.player_func')
+            exec("from AIs.{} import player_func; self.player_func1 = player_func".format(filename1))
         except:
             # if function is not found, the opposite wins
             self.__winner = 'player2'
             self.__game_end = True
 
         try:
-            exec("self.player_func2 = __import__('AIs.{}').".format(filename2) + filename2 + '.player_func')
+            exec("from AIs.{} import player_func; self.player_func2 = player_func".format(filename2))
         except:
             if self.__game_end:
                 # both players fail to write a correct function, no one wins
@@ -83,8 +88,8 @@ class GameDebug:
         if self.__game_end:
             return
 
-
-        self.__history_map.append(
+        # 历史地图字典，存入列表
+        self.__history_map["history"].append(
             self.__map.update(player1_actions, player2_actions)
         )
 
@@ -111,7 +116,8 @@ class GameDebug:
             self.web.click()
 
             ans = ''
-            for i in history[0][0]['edges'].keys():
+            ### print(self.__history_map)
+            for i in self.__history_map["map"]["edges"].keys():
                 ans += 'Node{} Power: '.format(str(i))
                 ans += str(history[0][2]['power'][i]) + '------>'
                 ans += str(history[1][0]['power'][i]) + '------>'
@@ -122,8 +128,18 @@ class GameDebug:
             if end_early is not None:
                 self.__winner = end_early
                 self.__game_end = True
-                if self.__winner=="draw":
-                    self.__winner = None
+                if self.__winner==0:
+                    self.__game_end_reason = (
+                        "Player2(%s)的基地被打爆了！"%self.__history_map["player_name"][1]
+                    )
+                if self.__winner==1:
+                    self.__game_end_reason = (
+                        "Player1(%s)的基地被打爆了！"%self.__history_map["player_name"][0]
+                    )
+                if self.__winner==-1:
+                    self.__game_end_reason = (
+                        "双方玩家的基地同时被打爆了！"
+                    )
                 break
 
             while True:
@@ -133,15 +149,20 @@ class GameDebug:
                 elif com == '':
                     break
         else:
-            self.__winner = self.__map.high_score()
-        print('winner: {}'.format(self.__winner))
+            self.__winner, self.__game_end_reason = self.__map.high_score()
+        
+        # 游戏已结束
+        self.__history_map["result"] = (
+            self.__game_end_reason + "\n"
+            + self.__history_map["player_name"][self.__winner] + "获胜！"
+        )
         return self.__winner
 
     def get_history(self):
         return self.__history_map
 
     def historyDebug(self):
-        history = self.get_history()
+        history = self.get_history()["history"]
         if len(history) > 2:
-            history = history[len(history) - 2:]
+            return history[len(history) - 2:]
         return history

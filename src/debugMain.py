@@ -8,14 +8,14 @@ MAX_TURN = 100 #调试期间允许的最大轮数
 MAX_TIME = 999 #调试期间允许的最大单步时间，改时间在mode == 1 or 2 时不生效
 
 # 在这里修改AI的名字
-player1 = 'player1'
-player2 = 'player2'
+player1 = 'player1测试名字'
+player2 = 'player_cmy01'
 
 # 使用何种地图生成器
 # 0代表随机地图生成器
 # 1代表六边形随机地图
 # 2代表六边形固定地图
-MAP_MODE= 2
+MAP_MODE= 1
 
 MODE = 0
 # 调试使用的mode
@@ -32,12 +32,14 @@ generate = {
 
 
 if MODE == 0:
-    g = GameDebug(player1, player2, MAX_TIME, MAX_TURN, generate[MAP_MODE]).run()
+    g = GameDebug(player1, player2, MAX_TIME, MAX_TURN, generate[MAP_MODE])
 elif MODE == 1:
-    g = GameDebug(player1, 'HumanDebug', 100, MAX_TURN, generate[MAP_MODE]).run()
+    g = GameDebug(player1, 'HumanDebug', 100, MAX_TURN, generate[MAP_MODE])
 elif MODE == 2:
-    g = GameDebug('HumanDebug', 'HumanDebug', 100, MAX_TURN, generate[MAP_MODE]).run()
+    g = GameDebug('HumanDebug', 'HumanDebug', 100, MAX_TURN, generate[MAP_MODE])
 
+g.run()
+print(g.get_history()["result"])
 
 input()# 使程序暂停，避免浏览器自动关闭
 
