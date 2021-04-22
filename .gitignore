@@ -1,3 +1,4 @@
 *.pyc
 src/output.json
 output.json
+.vscode
