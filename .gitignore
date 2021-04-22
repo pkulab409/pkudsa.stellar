@@ -2,3 +2,4 @@
 src/output.json
 output.json
 .vscode
+__pycache__
