@@ -219,7 +219,7 @@ class GameMap:
 
         Returns:
             int: [0: player1获胜, 1:player2获胜, None: 未结束, -1: 和局],
-            str: ["nodes": 节点数胜利, "power": 兵力数胜利]
+            str: [胜利方式, 节点数胜利, 兵力数胜利]
         """
         n_node1, n_node2, n_army1, n_army2 = 0, 0, 0, 0  # 分别表示两位玩家的占领节点数量，以及节点内总兵力
         for i in range(1, self.N+1):
@@ -231,13 +231,13 @@ class GameMap:
                 n_node2 += 1
                 n_army2 += self.nodes[i].power[1]
         if n_node1 > n_node2:
-            return 0, "nodes"
+            return 0, "回合上限到！比拼节点数！"
         elif n_node1 < n_node2:
-            return 1, "nodes"
+            return 1, "回合上限到！比拼节点数！"
         elif n_army1 > n_army2:
-            return 0, "power"
+            return 0, "回合上限到！节点数相同，比拼总兵力！"
         elif n_army1 < n_army2:
-            return 1, "power"
+            return 1, "回合上限到！节点数相同，比拼总兵力！"
         else:
             return -1
 
