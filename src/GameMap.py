@@ -17,6 +17,8 @@ class GameMap:
         Args:
             design (dict): 地图文件中的字典
         """
+        self.xy = design["xy"]
+        design = design["design"]
         self.N = len(design) # 节点数，增加代码可读性
         self.nodes = [Node(i) for i in range(self.N+2)]
         self.nodes[1].set_power(INIT_POWER_1, True)
@@ -156,18 +158,18 @@ class GameMap:
             new0 = n.power[0]
             new1 = n.power[1]  # 两个临时变量
             if n.belong == 0:
-                new0 = n.power[0] + n.spawn_rate * \
+                new0 = n.power[0] + n.spawn_rate / n.power_limit * \
                     (n.power_limit - n.power[0]) * n.power[0]
                 if n.power[1] > n.power_limit:
-                    new1 = n.power[1] + n.spawn_rate * \
+                    new1 = n.power[1] + n.spawn_rate / n.power_limit * \
                         (n.power_limit - n.power[1]) * n.power[1]
                 new0, new1 = max(new0, 0), max(new1, 0)
                 n.set_power((new0, new1), False)
             if n.belong == 1:
-                new1 = n.power[1] + n.spawn_rate * \
+                new1 = n.power[1] + n.spawn_rate / n.power_limit * \
                     (n.power_limit - n.power[1]) * n.power[1]
                 if n.power[0] > n.power_limit:
-                    new0 = n.power[0] + n.spawn_rate * \
+                    new0 = n.power[0] + n.spawn_rate / n.power_limit * \
                         (n.power_limit - n.power[0]) * n.power[0]
                 new0, new1 = max(new0, 0), max(new1, 0)
                 n.set_power((new0, new1), False)
@@ -190,26 +192,26 @@ class GameMap:
         for action in player2_actions:
             self.__move(1, action)
 
-        ans = [self.export_as_dic(player1_actions,player2_actions)]
+        ans = [self.export_battle_as_dic(player1_actions,player2_actions)]
 
         self.__combat()
-        ans.append(self.export_as_dic())
+        ans.append(self.export_battle_as_dic())
         self.__natality()
-        ans.append(self.export_as_dic())
+        ans.append(self.export_battle_as_dic())
         return ans #返回一个三元列表，里面是代表本回合可视化的三个字典
 
     def end_early(self):
         """判断当前局面上是否有胜者出现
 
         Returns:
-            str: ['draw': 平局, 'player1': player1获胜, 'player2':player2获胜 , None: 未结束]
+            int: [-1: 平局, 0: player1获胜, 1:player2获胜 , None: 未结束]
         """
         if self.nodes[1].belong == 1 and self.nodes[self.N].belong == 0:
-            return "draw"
+            return -1
         if self.nodes[self.N].belong == 0:
-            return "player1"
+            return 0
         if self.nodes[1].belong == 1:
-            return "player2"
+            return 1
 
         return None
 
@@ -217,7 +219,8 @@ class GameMap:
         """判断当前局面上那一方的分数更高，判断逻辑是：先判断哪一方占有节点数量多，若一样多，则判断总power高者
 
         Returns:
-            str: ['player1': player1获胜, 'player2':player2获胜 , None: 未结束]
+            int: [0: player1获胜, 1:player2获胜, None: 未结束, -1: 和局],
+            str: [胜利方式, 节点数胜利, 兵力数胜利]
         """
         n_node1, n_node2, n_army1, n_army2 = 0, 0, 0, 0  # 分别表示两位玩家的占领节点数量，以及节点内总兵力
         for i in range(1, self.N+1):
@@ -229,17 +232,17 @@ class GameMap:
                 n_node2 += 1
                 n_army2 += self.nodes[i].power[1]
         if n_node1 > n_node2:
-            return 'player1'
+            return 0, "回合上限到！比拼节点数！"
         elif n_node1 < n_node2:
-            return 'player2'
+            return 1, "回合上限到！比拼节点数！"
         elif n_army1 > n_army2:
-            return 'player1'
+            return 0, "回合上限到！节点数相同，比拼总兵力！"
         elif n_army1 < n_army2:
-            return 'player2'
+            return 1, "回合上限到！节点数相同，比拼总兵力！"
         else:
-            return None
+            return -1
 
-    def export_as_dic(self, action_lst_1: list = [], action_lst_2: list = []):
+    def export_battle_as_dic(self, action_lst_1: list = [], action_lst_2: list = []):
         """将当前map返回为字典，适用于实现可视化的调试函数
 
         Args:
@@ -247,7 +250,7 @@ class GameMap:
             action_lst_2 (list): 包含若干player2操作元组的列表
 
         Returns:
-            dict: 包含map信息的字典
+            dict: 包含map每一回合战斗信息的字典，不包含地图本身的节点连接情况等等常量
         """
         return {
             # 是三元tuple
@@ -255,12 +258,22 @@ class GameMap:
             # 是0or1
             "owner": {i: self.nodes[i].belong for i in range(1, self.N+1)},
             # 存储连接的其他节点信息,示例:{1:1.2, 2:2.3}意思是这个节点可以去1号，过路费1.2,以此类推
-            "edges": {i: self.nodes[i].get_next() for i in range(1, self.N+1)},
-            # 是float
-            "limit": {i: self.nodes[i].power_limit for i in range(1, self.N+1)},
-            "xy": g_design["xy"],  # 地图每个节点可视化的坐标
+            
             "actions": {
                 1: action_lst_1,  # 三元元组的列表
                 2: action_lst_2
             }
+        }
+    
+    def export_map_as_dic(self):
+        """将当前map返回为字典，适用于实现可视化的调试函数
+
+        Returns:
+            dict: 包含map地图本身的节点连接情况等等常量的字典
+        """
+        return {
+            "edges": {i: self.nodes[i].get_next() for i in range(1, self.N+1)},
+            # 是float
+            "limit": {i: self.nodes[i].power_limit for i in range(1, self.N+1)},
+            "xy": self.xy,  # 地图每个节点可视化的坐标
         }

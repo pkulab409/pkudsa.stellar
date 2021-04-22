@@ -1,5 +1,4 @@
 from random import randint as rd
-
 from GameMap import GameMap
 
 from AIs.player_cmy01 import noob_littleAI
@@ -7,8 +6,6 @@ from AIs.player_cmy01 import noob_littleAI
 # 重要约定！！！
 PLAYER_1 = 0
 PLAYER_2 = 1
-
-player_func = noob_littleAI
 
 def player_func_un(map_info: GameMap, player_id: int):
     ACTIONS = []
@@ -34,3 +31,5 @@ def player_func_un(map_info: GameMap, player_id: int):
     # 随机出兵
     # print(ACTIONS)
     return ACTIONS
+
+player_func = player_func_un
