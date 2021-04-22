@@ -9,7 +9,7 @@ MAX_TIME = 999 #调试期间允许的最大单步时间，改时间在mode == 1 
 
 # 在这里修改AI的名字
 player1 = 'player1测试名字'
-player2 = 'player_cmy01'
+player2 = 'playerfuck'
 
 # 使用何种地图生成器
 # 0代表随机地图生成器

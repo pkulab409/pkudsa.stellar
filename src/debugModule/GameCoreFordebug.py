@@ -28,7 +28,8 @@ class GameDebug:
         self.__max_time = max_time
         self.__map = GameMap(map_args)
         self.__winner = None
-        self.__game_end = False
+        self.__game_end = False        
+        self.__game_end_reason = "游戏未结束。"
         self.__max_turn = max_turn
         self.__history_map = {
             "map": self.__map.export_map_as_dic(), 
@@ -42,7 +43,7 @@ class GameDebug:
             exec("from AIs.{} import player_func; self.player_func1 = player_func".format(filename1))
         except:
             # if function is not found, the opposite wins
-            self.__winner = 'player2'
+            self.__winner = 1
             self.__game_end = True
 
         try:
@@ -52,7 +53,7 @@ class GameDebug:
                 # both players fail to write a correct function, no one wins
                 self.__winner = None
             else:
-                self.__winner = 'player1'
+                self.__winner = 0
                 self.__game_end = True
 
         history = self.get_history()
