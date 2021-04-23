@@ -59,5 +59,5 @@ g_design3 = {
     1: {2: 0}, 2: {1: 0}
 }
 
-g_design_ramdom = dg(2,[1,4],3).generate()
+g_design_ramdom = dg(2,[1,4],3)()
 g_design = g_design_ramdom
