@@ -23,7 +23,7 @@ class EliminationGame:
         self.repeat = repeat
         self.map_generator = map_generator
     
-    def match(self, player1_index: int, player2_index: int) -> Tuple[int]:
+    def match(self, player1_index: int, player2_index: int):
         score = [0, 0]
         player1 = self.participants[player1_index]
         player2 = self.participants[player2_index]
@@ -37,7 +37,7 @@ class EliminationGame:
         #while score[0] == score[1]:
         return (player1_index, player2_index) if score[0] > score[1] else (player2_index, player1_index)
     
-    def make_group(self, index_list: List[int]) -> List[Tuple[int]]:
+    def make_group(self, index_list: List[int]):
         length = len(index_list)
         assert length in (2, 4, 8)
         return list(zip(index_list[:length//2], index_list[-1:length//2 - 1:-1]))
@@ -46,7 +46,7 @@ class EliminationGame:
         group = self.make_group(index_list)
         return list(list(x) for x in zip(*map(lambda pair: self.match(*pair), group)))
     
-    def single_elimination(self) -> str:
+    def single_elimination(self):
         """single elimination game
 
         Returns:
@@ -57,7 +57,7 @@ class EliminationGame:
         final_winner = self.match_all(semi_winners)[0]
         return self.participants[final_winner[0]]
 
-    def double_elimination(self) -> List[str]:
+    def double_elimination(self):
         """Double elimination game
         see https://zh.wikipedia.org/wiki/%E5%8F%8C%E8%B4%A5%E6%B7%98%E6%B1%B0%E5%88%B6#/media/File:DoubleElim.jpg
         Returns:
@@ -78,17 +78,17 @@ class EliminationGame:
 
 if __name__ == "__main__":
     ai_list = [
+        "player1_调参1",
+        "player1_调参2",
+        "player1测试名字",
         "player2",
-        "player2",
-        "player2",
-        "player2",
-        "player2",
-        "player2",
-        "player2",
-        "player2",
+        "凑数选手",
+        "凑数选手",
+        "凑数选手",
+        "凑数选手",
     ]
 
-    e = EliminationGame(ai_list, DesignGenerator(0.8, (2, 4), 3), 5)
-    #e = EliminationGame(ai_list, lambda:  Generate_Hexagon(4, 0.20, 0.20), 5)
+    #e = EliminationGame(ai_list, DesignGenerator(0.8, (2, 4), 3), 5)
+    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(4, 0.20, 0.20), 5)
     a = e.double_elimination()
     print(a)

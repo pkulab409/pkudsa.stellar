@@ -157,22 +157,19 @@ class GameMap:
         for n in self.nodes:
             new0 = n.power[0]
             new1 = n.power[1]  # 两个临时变量
-            if n.belong == 0:
+
+            if new0<n.power_limit:
                 new0 = n.power[0] + n.spawn_rate / n.power_limit * \
                     (n.power_limit - n.power[0]) * n.power[0]
-                if n.power[1] > n.power_limit:
-                    new1 = n.power[1] + n.spawn_rate / n.power_limit * \
-                        (n.power_limit - n.power[1]) * n.power[1]
-                new0, new1 = max(new0, 0), max(new1, 0)
-                n.set_power((new0, new1), False)
-            if n.belong == 1:
+            else:
+                new0 = n.power_limit+(new0-n.power_limit)*n.despawn_rate
+            if new1<n.power_limit:
                 new1 = n.power[1] + n.spawn_rate / n.power_limit * \
                     (n.power_limit - n.power[1]) * n.power[1]
-                if n.power[0] > n.power_limit:
-                    new0 = n.power[0] + n.spawn_rate / n.power_limit * \
-                        (n.power_limit - n.power[0]) * n.power[0]
-                new0, new1 = max(new0, 0), max(new1, 0)
-                n.set_power((new0, new1), False)
+            else:
+                new1 = n.power_limit+(new1-n.power_limit)*n.despawn_rate
+            
+            n.set_power((new0, new1), False)
 
     def update(self, player1_actions, player2_actions):
         """这是用来更新地图的函数，将作用于所有的节点，逻辑是先judge，再move，再combat，再natality
@@ -188,9 +185,15 @@ class GameMap:
         self.__judge(player2_actions, 1)
 
         for action in player1_actions:
-            self.__move(0, action)
+            try:
+                self.__move(0, action)
+            except:
+                pass
         for action in player2_actions:
-            self.__move(1, action)
+            try:
+                self.__move(1, action)
+            except:
+                pass
 
         ans = [self.export_battle_as_dic(player1_actions,player2_actions)]
 
@@ -240,7 +243,7 @@ class GameMap:
         elif n_army1 < n_army2:
             return 1, "回合上限到！节点数相同，比拼总兵力！"
         else:
-            return -1
+            return -1, "回合上限到！节点数相同，总兵力也相同！和局！！"
 
     def export_battle_as_dic(self, action_lst_1: list = [], action_lst_2: list = []):
         """将当前map返回为字典，适用于实现可视化的调试函数

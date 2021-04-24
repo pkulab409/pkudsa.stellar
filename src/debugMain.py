@@ -8,7 +8,7 @@ MAX_TURN = 100 #调试期间允许的最大轮数
 MAX_TIME = 999 #调试期间允许的最大单步时间，改时间在mode == 1 or 2 时不生效
 
 # 在这里修改AI的名字
-player1 = 'player1测试名字'
+player1 = 'player1_调参2'
 player2 = 'player2'
 
 # 使用何种地图生成器
@@ -25,7 +25,7 @@ MODE = 0
 
 dg = DesignGenerator(bridge=0.8, branch=(2, 4), depth=3)
 generate = {
-    0: dg.generate(),
+    #0: dg.generate(),
     1: Generate_Hexagon(4, 0.20, 0.20),
     2: g_design2
 }
