@@ -1,3 +1,4 @@
+from MapDesign import g_design
 from Node import Node
 from config import POWER_LIMIT, INIT_POWER_1, INIT_POWER_2
 

@@ -2,7 +2,6 @@ import json
 
 from GameCore import Game
 from MapDesign import g_design
-from config import MAX_TIME, MAX_TURN
 from DesignGenerator import DesignGenerator
 from HexagonForce import Generate_Hexagon
 
@@ -11,7 +10,7 @@ cnt = [0, 0]
 if __name__ == '__main__':
     for i in range(1):
         # dg = DesignGenerator(bridge=0.8, branch=(2, 4), depth=3)
-        g = Game('player1测试名字', 'player2', MAX_TIME, MAX_TURN, Generate_Hexagon(4, 0.20, 0.20))
+        g = Game('player1测试名字', 'player2', Generate_Hexagon(4, 0.20, 0.20))
 
         fuck = g.run()
         if fuck == 0:

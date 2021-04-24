@@ -1,4 +1,5 @@
 *.pyc
 src/output.json
 output.json
-*debug.sjson
+.vscode
+__pycache__

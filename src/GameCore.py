@@ -12,22 +12,20 @@ PLAYER_2 = 1
 
 
 class Game:
-    def __init__(self, filename1: str, filename2: str, max_time: float, max_turn: int, map_args: dict):
+    def __init__(self, filename1: str, filename2: str, map_args: dict):
         """初始化一局游戏，具体规则请参见文档（文档组加油！
 
         Args:
             filename1 (str): 玩家1的脚本
             filename2 (str): 玩家2的脚本目录
-            max_time (float): 单步的最大思考时间
-            max_turn (int): 允许进行的最大回合数
             map_args (dict): 包含地图配置的字典
         """
-        self.__max_time = max_time
+        self.__max_time = config.MAX_TIME
         self.__map = GameMap(map_args)
         self.__winner = None
         self.__game_end = False
         self.__game_end_reason = "游戏未结束。"
-        self.__max_turn = max_turn
+        self.__max_turn = config.MAX_TURN
         self.__history_map = {
             "map": self.__map.export_map_as_dic(),
             "player_name": {0: filename1, 1: filename2, -1: "No player(draw)", None: "玩家函数错误" },
@@ -114,6 +112,8 @@ class Game:
                     self.__game_end_reason = (
                         "双方玩家的基地同时被打爆了！"
                     )
+                    self.__winner = self.__map.high_score()[0]
+                    assert self.__winner in (0, 1, -1)
                 break
         else:
             self.__winner, self.__game_end_reason = self.__map.high_score()
@@ -123,6 +123,7 @@ class Game:
             self.__game_end_reason + "\n"
             + self.__history_map["player_name"][self.__winner] + "获胜！"
         )
+        
         return self.__winner
 
     def get_history(self):
