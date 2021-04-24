@@ -1,7 +1,7 @@
-from config import SPAWN_RATE,POWER_LIMIT
+from config import SPAWN_RATE,POWER_LIMIT,DESPAWN_RATE
 
 class Node:
-    def __init__(self, number, spawn_rate=SPAWN_RATE, belong=-1, power_limit=POWER_LIMIT):
+    def __init__(self, number, spawn_rate=SPAWN_RATE, belong=-1, power_limit=POWER_LIMIT, despawn_rate = DESPAWN_RATE):
         """生成一个游戏节点，初始化并存储相关信息。
 
         number: 节点的编号，从1开始\n
@@ -21,6 +21,7 @@ class Node:
         self.__power = (0, 0) # 重要！！！power现在起是元组类型！！！
         self.__belong = belong
         self.__spawn_rate = spawn_rate
+        self.__despawn_rate = despawn_rate
         self.__power_limit = power_limit
         self.__nextinfo = {}
 
@@ -54,6 +55,10 @@ class Node:
     @property
     def spawn_rate(self):
         return self.__spawn_rate
+    
+    @property
+    def despawn_rate(self):
+        return self.__despawn_rate
 
     @property
     def power_limit(self):

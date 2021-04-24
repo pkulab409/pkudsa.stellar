@@ -8,7 +8,7 @@ class DesignGenerator:
         self.branch = branch
         self.depth = depth
     
-    def generate(self):
+    def __call__(self):
         design = {}
         depth_nodes = [[] for i in range(self.depth)]
         depth_nodes[0].append(1)

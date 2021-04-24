@@ -33,8 +33,8 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
                 design[cnt] = {}
                 xy[cnt] = ( (-a+i+1) *l, ((a-1+i)/2-j) *l )
     
-    print("N ==",N)#
-    print("cnt ==",cnt)#
+    #print("N ==",N)#
+    #print("cnt ==",cnt)#
     
     for i in range(1,N//2+1): # 中心对称建节点
         design[N+1-i] = {}
@@ -66,11 +66,11 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
     dfs(1)
     for i in range(1,N+1):
         if visited[i]==False:
-            print("Oh shit. This map is not connected. \nRegenerating. ")
+            #print("Oh shit. This map is not connected. \nRegenerating. ")
             return -1 # 生成失败
     for i in range(1,N+1):
         if len(design[i])<2: # 陈老师说，每个节点至少2度
-            print("Oh no, one of the nodes has only one edge. \nRegenerating. ")
+            #print("Oh no, one of the nodes has only one edge. \nRegenerating. ")
             return -1 # 生成失败
 
 
