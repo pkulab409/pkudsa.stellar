@@ -181,20 +181,20 @@ class GameMap:
         Returns:
             list: 用于可视化的一个列表，里面包含三个字典
         """
-        self.__judge(player1_actions, 0)
-        self.__judge(player2_actions, 1)
+        try:
+            self.__judge(player1_actions, 0)
+        except:
+            player1_actions = []
+        try:
+            self.__judge(player2_actions, 1)
+        except:
+            player2_actions = []
 
         for action in player1_actions:
-            try:
-                self.__move(0, action)
-            except:
-                pass
+            self.__move(0, action)
         for action in player2_actions:
-            try:
-                self.__move(1, action)
-            except:
-                pass
-
+            self.__move(1, action)
+            
         ans = [self.export_battle_as_dic(player1_actions,player2_actions)]
 
         self.__combat()
