@@ -1,8 +1,9 @@
 from GameMap import GameMap
-from config import POWER_LIMIT
+#from config import POWER_LIMIT
+POWER_LIMIT = 100
 
 def AI_made_by_xhzgenius(map_info: GameMap, player_id: int, 
-节点空位占的权重: float = 1, 铺场转移比例: float = 0.5):
+节点空位占的权重: float = 1.8, 铺场转移比例: float = 0.75):
     ACTIONS = []
     # Bellman-Ford求最短路径长度
     d = [[999999999 for j in range(1,map_info.N+11)] for i in range(1,map_info.N+11)]
@@ -90,3 +91,10 @@ def AI_made_by_xhzgenius(map_info: GameMap, player_id: int,
 
     #print(ACTIONS)
     return ACTIONS
+
+class player_class:
+    def __init__(self, player_id: int):
+        self.player_id = player_id
+    
+    def player_func(self, map_info: GameMap):
+        return AI_made_by_xhzgenius(map_info, self.player_id)

@@ -26,6 +26,7 @@ class Game:
         self.__game_end = False
         self.__game_end_reason = "游戏未结束。"
         self.__max_turn = config.MAX_TURN
+        self.__player = []
         self.__history_map = {
             "map": self.__map.export_map_as_dic(),
             "player_name": {0: filename1, 1: filename2, -1: "No player(draw)", None: "玩家函数错误" },
@@ -33,15 +34,17 @@ class Game:
             "history": [self.__map.update([], [])]
         }#开局的地图也要记录
 
-        try:
-            exec("from AIs.{} import player_func; self.player_func1 = player_func".format(filename1))
-        except:
+        #try:
+        exec("""from AIs.{} import player_class as player_class1
+self.addPlayer(player_class1(0))""".format(filename1))
+        '''except:
             # if function is not found, the opposite wins
             self.__winner = 1
-            self.__game_end = True
+            self.__game_end = True'''
 
         try:
-            exec("from AIs.{} import player_func; self.player_func2 = player_func".format(filename2))
+            exec("""from AIs.{} import player_class as player_class2
+self.addPlayer(player_class2(1))""".format(filename2))
         except:
             if self.__game_end:
                 # both players fail to write a correct function, no one wins
@@ -50,27 +53,28 @@ class Game:
                 self.__winner = 0
                 self.__game_end = True
 
-
+    def addPlayer(self, player):
+        self.__player.append(player)
 
     def next_step(self):
         """这里是对局面进行一次更新，询问两方玩家获得actionList，然后调用update()
         """
         map_info1 = deepcopy(self.__map)
         map_info2 = deepcopy(self.__map)
-        if False: # 测试代码，测试的时候改成False
+        if True: # 测试代码，测试的时候改成False
             try:
                 with time_limit(self.__max_time, "player1"):
-                    player1_actions = self.player_func1(map_info1,0)
+                    player1_actions = self.__player[0].player_func(map_info1)
             except Exception:
                 print("Player func 1 error!")
                 player1_actions = []
         else:
             with time_limit(self.__max_time, "player1"):
-                player1_actions = self.player_func1(map_info1,0)
+                player1_actions = self.__player[0].player_func(map_info1)
             # 这里是否应该捕捉到异常之后直接判负?
         try:
             with time_limit(self.__max_time, "player2"):
-                player2_actions = self.player_func2(map_info2,1)
+                player2_actions = self.__player[1].player_func(map_info1)
         except Exception:
             print("Player func 2 error!")
             player2_actions = []

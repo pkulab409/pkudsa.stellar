@@ -1,5 +1,6 @@
 from GameMap import GameMap
-from config import POWER_LIMIT
+#from config import POWER_LIMIT
+POWER_LIMIT = 100
 
 def AI_made_by_xhzgenius(map_info: GameMap, player_id: int, 
 节点空位占的权重: float = 1.8, 铺场转移比例: float = 0.8, 开始铺场的最小兵力: int = 20):
@@ -98,3 +99,6 @@ def AI_made_by_xhzgenius(map_info: GameMap, player_id: int,
 
     #print(ACTIONS)
     return ACTIONS
+
+def player_func(map_info, player_id):
+    return AI_made_by_xhzgenius(map_info, player_id)

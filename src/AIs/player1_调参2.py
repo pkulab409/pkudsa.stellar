@@ -1,5 +1,6 @@
-from AIs.XHZAI一代 import AI_made_by_xhzgenius as ai
+from XHZAI一代 import AI_made_by_xhzgenius as ai
 from random import random as rd
+
 
 
 #节点空位占的权重 = 1+rd()*5
