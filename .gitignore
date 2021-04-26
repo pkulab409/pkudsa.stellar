@@ -1,5 +1,4 @@
 *.pyc
-src/output.json
-output.json
+*.json
 .vscode
 __pycache__
