@@ -34,13 +34,13 @@ class Game:
             "history": [self.__map.update([], [])]
         }#开局的地图也要记录
 
-        #try:
-        exec("""from AIs.{} import player_class as player_class1
+        try:
+            exec("""from AIs.{} import player_class as player_class1
 self.addPlayer(player_class1(0))""".format(filename1))
-        '''except:
+        except:
             # if function is not found, the opposite wins
             self.__winner = 1
-            self.__game_end = True'''
+            self.__game_end = True
 
         try:
             exec("""from AIs.{} import player_class as player_class2
