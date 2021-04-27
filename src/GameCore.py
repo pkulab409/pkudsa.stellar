@@ -74,7 +74,7 @@ self.addPlayer(player_class2(1))""".format(filename2))
             # 这里是否应该捕捉到异常之后直接判负?
         try:
             with time_limit(self.__max_time, "player2"):
-                player2_actions = self.__player[1].player_func(map_info1)
+                player2_actions = self.__player[1].player_func(map_info2)
         except Exception:
             print("Player func 2 error!")
             player2_actions = []
