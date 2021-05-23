@@ -97,7 +97,7 @@ print(config.DESPAWN_RATE) #0.75
 
 - 节点的兵力数量。`self.power=(power1,power2),` 为元组tuple，内部存储两个float类型浮点数，`power1`代表玩家1的兵力，`power2`代表玩家2的兵力。示例：无主节点`self.power=(0,0)`;若玩家1对某节点有1.2的兵力，则`self.power=(1.2,0)`。
 
-- 邻接节点的信息。`self.nextinfo=[node_id1,node_id2,...]`,为列表, 内部存储邻接节点的编号；
+- 邻接节点的信息。`self.nextinfo=[node_id1,node_id2,...]`,为列表, 内部存储邻接节点的编号；可通过调用`self.get_next()`访问。
 
   
 
@@ -110,7 +110,7 @@ print(config.DESPAWN_RATE) #0.75
 玩家可以调用`GameMap`类中涉及的属性和方法：
 
 - ”游戏数据结构“部分中涉及的所有Node的属性。再次强调，`GameMap.nodes`是存储所有节点的列表，每个编号的Node可以从`GameMap.nodes[i]`直接访问，注意之前的编号的约定。
-- 如果只想要获得某节点相连的其他节点的编号，可以直接调用`node.nextinfo`，返回的是存储int型邻接节点编号的字典。
+- 如果只想要获得某节点相连的其他节点的编号，必须直接调用`node.get_next()`，返回的是存储int型邻接节点编号的字典。访问`node.nextinfo`是非法行为。
 
 ##### 4.2 关于玩家提交的文件
 
@@ -137,7 +137,7 @@ def player_func(map_info,player_id): #辅助函数
         a, b, c = action
         if map_info.nodes[a].belong != player_id:
             return False
-        if b not in map_info.nodes[a].nextinfo:
+        if b not in map_info.nodes[a].get_next():
             return False
         if tmp_left[a] <= c + 0.01:
             return False
@@ -187,17 +187,21 @@ class player_class: #格式要求
 
 ##### 6.2 本地调试工具
 
-各小组可以运行`debuggerCmd.py`来进行本地调试工具。在命令行窗口中输入以下命令：
+- **方法一** 在命令行窗口中输入以下命令：
 
 ```
 python3 debuggerCmd.py player_1.py player_2.py
 ```
 
-成功运行之后，会生成复盘数据存储于`output.json`文件中。
+​	其中`player_1.py,player2.py`为同文件夹下对战双方提交的python文件名。
+
+- **方法二** 各小组可以直接运行`debuggerCmd.py`，选取两个python文件进行调试。
+
+成功运行之后，会生成复盘数据存储于根目录`output.json`文件中。
 
 ##### 6.3 复盘数据可视化工具
 
-- **方法一** 运行`server.py`进行复盘数据可视化。
+- **方法一** 首先在命令行窗口输入`pip install flask`，再运行`debugVisualizer.py`，按指示进行复盘数据可视化。
 - **方法二** 访问https://mi.js.org/dsa21vis/battleground.html。将`output.json`文件拖入网页界面，就可以按网页指示进行复盘数据可视化。
 
 
@@ -215,6 +219,10 @@ python3 debuggerCmd.py player_1.py player_2.py
 6月12日-6月14日为天梯赛，代码竞技场选取天梯前八名出线，进入淘汰赛决赛。
 
 最后6月15日在课堂进行淘汰赛决赛，决出冠亚季军，发放奖品、纪念品等。保留人机作战为彩蛋。
+
+
+
+#### 祝各小组大作业顺利~
 
 
 
