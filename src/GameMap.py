@@ -26,8 +26,7 @@ class GameMap:
 
         for number in design.keys():
             for nextnumber in design[number].keys():
-                self.nodes[number].set_connection(
-                    nextnumber, float(design[number][nextnumber]))
+                self.nodes[number].set_connection(nextnumber)
 
     def __repr__(self):
         """用于打印地图信息，面向调试
@@ -134,7 +133,7 @@ class GameMap:
 
         # 以根号作为兵力损耗的单位并且家手过路费
         tmp_pw = list(self.nodes[end].power)
-        power -= power ** 0.5 - self.nodes[start].get_nextCost(end)
+        power -= power ** 0.5
         power = max(power, 0)  # 兵力损耗至小于零时，相当于兵力为零
         tmp_pw[tmp_player_id] += power
         self.nodes[end].set_power(tuple(tmp_pw), False)
