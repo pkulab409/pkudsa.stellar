@@ -1,0 +1,125 @@
+from GameMap import GameMap
+#from config import POWER_LIMIT
+POWER_LIMIT = 100
+MAX_TURN = 100
+
+class player_class:
+    def __init__(self, player_id: int):
+        self.player_id = player_id
+        self.d = None
+        self.turn = 0
+        self.strategy = "expand"
+
+    def Bellman_Ford(self, map_info: GameMap):
+        # Bellman-Ford求最短路径长度
+        self.d = [[999999999 for j in range(1,map_info.N+11)] for i in range(1,map_info.N+11)]
+        d = self.d
+        for i in range(1,map_info.N+1):
+            for j in range(1,map_info.N+1):
+                if i==j:
+                    d[i][j] = 0
+                elif j in map_info.nodes[i].get_next():
+                    d[i][j] = 1
+        for i in range(1,map_info.N+1):
+            for j in range(1,map_info.N+1):
+                for k in range(1,map_info.N+1):
+                    d[i][j] = min(d[i][j],d[i][k]+d[k][j])
+        # 现在，d就是最短路径长度数组
+
+
+    def player_func(self, map_info: GameMap, 
+        节点空位占的权重: float = 1.8, 铺场转移比例: float = 0.75):
+        ACTIONS = []
+        if self.d==None:
+            self.Bellman_Ford(map_info)
+
+        d = self.d
+        player_id = self.player_id
+        self.turn += 1
+        if self.turn>=90:
+            self.strategy = "attack"
+
+        # 判断整个局势
+        ENEMY_BASE = map_info.N if player_id==0 else 1
+        my_nodes = []
+        enemy_nodes = [] # List of Nodes
+        danger = {}
+        need_help = {} # Dict of bools
+        niubility = {} # Dict of ints
+        for i in map_info.nodes:
+            danger[i.number] = 0
+            if i.belong==player_id:
+                my_nodes.append(i)
+                need_help[i.number] = False
+                niubility[i.number] = i.power[player_id]
+            for j in i.get_next():
+                danger[i.number] += map_info.nodes[j].power[1-player_id]
+                pass
+            if i.belong==1-player_id:
+                enemy_nodes.append(i)
+            
+        #danger_lst = sorted(danger, key = lambda x: -danger[x] )
+        #niubility_lst = sorted(niubility, key = lambda x: -niubility[x] )
+        # 所有节点，按照危险程度和牛逼程度排序
+
+        #print("Danger:", danger)
+        #print("NB", niubility)
+
+        def decay(a: int, x: int, y: int):
+            return a-a**0.5
+
+        def Judge_node(x: int, strategy: str):
+            if strategy=="expand":
+                if danger[x]>niubility[x]:
+                    need_help[x] = True
+                    return (x, "defend", danger[x]-niubility[x])
+                if niubility[x]<=10:
+                    return (x, "wait")
+                y = min(
+                    map_info.nodes[x].get_next(), 
+                    key = choose_target_peace
+                )
+                #print(x,y)
+                #print(decay(niubility[x]-10,x,y))
+                if decay(niubility[x]/2,x,y) > map_info.nodes[y].power[1-player_id]:
+                    return (x, "expand", niubility[x]*铺场转移比例, y)
+                return (x, "wait")
+            elif strategy=="attack":
+                y = min(
+                    map_info.nodes[x].get_next(),
+                    key = choose_target_attack
+                )
+                return (x, "expand", niubility[x]*铺场转移比例, y)
+
+        def choose_target_peace(y: int):
+            "数字越小，说明越需要往这里调兵"
+            nodey = map_info.nodes[y]
+            if nodey.belong==player_id:
+                if need_help[y]:
+                    return -999999999
+                else:
+                    return (
+                        999999999+
+                        d[y][ENEMY_BASE]-
+                        (POWER_LIMIT-nodey.power[player_id])*0.02*节点空位占的权重
+                    )
+            return nodey.power[1-player_id]+d[y][ENEMY_BASE]
+
+        def choose_target_attack(y: int):
+            "数字越小，说明越需要往这里调兵"
+            nodey = map_info.nodes[y]
+            return d[y][ENEMY_BASE]+(nodey.belong==player_id)*1.5
+
+        # 开始行动
+        for x in my_nodes:
+            x_action = Judge_node(x.number, self.strategy)
+            #print(x.number, x_action)
+            if x_action[1]=="wait":
+                continue
+            elif x_action[1]=="defend":
+                pass
+            elif x_action[1]=="expand":
+                ACTIONS.append((x_action[0], x_action[3], x_action[2]))
+
+        #print(ACTIONS)
+        return ACTIONS
