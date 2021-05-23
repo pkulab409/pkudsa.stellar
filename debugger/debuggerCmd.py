@@ -108,8 +108,11 @@ class GameWithModule(Game):
         self.map['winner'] = self._Game__winner
 
 
-if __name__ == '__main__':
-    # 确保玩家代码
+def ensure_players():
+    """
+    确保双方玩家代码正确可读取
+    返回玩家模块与名称列表
+    """
     PLAYER_MODULES = [None] * 2
     PLAYER_NAMES = ['code'] * 2
     _LAST_DIR = SRC_PATH
@@ -136,8 +139,15 @@ if __name__ == '__main__':
                 PLAYER_NAMES[i] = player_name
                 break
 
+    return PLAYER_MODULES, PLAYER_NAMES
+
+
+if __name__ == '__main__':
+    # 确保玩家代码
+    modules, names = ensure_players()
+
     # 运行游戏
-    game = GameWithModule(PLAYER_MODULES, PLAYER_NAMES, {})
+    game = GameWithModule(modules, names, {})
     game.run()
 
     # 保存记录
