@@ -9,7 +9,7 @@ class Node:
         power: 当前的兵力数列表 [player1, player2]\n
         spawn_rate: 节点产兵的速率, 产兵规则参见GameMap().__natality()\n
         power_limit: 允许的单个节点无惩罚兵力上限\n
-        nextinfo: 存储与其他节点的联系 {节点编号: 过路费...}\n
+        nextinfo: 存储与其他节点的联系 [节点编号]\n
 
         Args:
             number (int): 节点的编号\n
@@ -23,7 +23,7 @@ class Node:
         self.__spawn_rate = spawn_rate
         self.__despawn_rate = despawn_rate
         self.__power_limit = power_limit
-        self.__nextinfo = {}
+        self.__nextinfo = []
 
     def __repr__(self):
         """用来打印节点的信息
@@ -64,22 +64,17 @@ class Node:
     def power_limit(self):
         return self.__power_limit
 
-    def set_connection(self, nodeNumber, travelCost):
+    def set_connection(self, nodeNumber):
         """设置与当前节点连接的节点，和行进到连接节点的过路费
 
         Args:
             node_number (int): 连接的节点\n
-            travel_cost (float): 过路费\n
-
         Raises:
             RuntimeError: nodeNumber must be int\n
-            RuntimeError: travelCost must be float\n
         """
         if not isinstance(nodeNumber, int):
             raise RuntimeError('node_number must be int')
-        if not isinstance(travelCost, float):
-            raise RuntimeError('travel_cost must be float')
-        self.__nextinfo[nodeNumber] = travelCost
+        self.__nextinfo.append(nodeNumber)
 
     def get_next(self):
         """用于获取当前节点可以通向的节点编号
@@ -88,25 +83,9 @@ class Node:
             list: 当前节点可以通向的节点编号的列表
         """
         lst = []
-        for number in self.__nextinfo.keys():
+        for number in self.__nextinfo:
             lst.append(number)
         return lst
-
-    def get_nextCost(self, next_):
-        """用于获取当前节点与目标节点之间的过路费
-
-        Args:
-            next_ (int): 目标节点编号
-
-        Raises:
-            RuntimeError: next_ must have connection with node
-
-        Returns:
-            float: 过路费
-        """
-        if next_ not in self.__nextinfo.keys():
-            raise RuntimeError('next_ must have connection with node')
-        return self.__nextinfo[next_]
 
     
     def set_power(self, p:tuple, needJudge:bool):
