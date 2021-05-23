@@ -37,7 +37,7 @@ class Game:
         try:
             exec("""from AIs.{} import player_class as player_class1
 self.addPlayer(player_class1(0))""".format(filename1))
-        except TabError:
+        except:
             # if function is not found, the opposite wins
             self.__winner = 1
             self.__game_end = True
@@ -61,7 +61,7 @@ self.addPlayer(player_class2(1))""".format(filename2))
         """
         map_info1 = deepcopy(self.__map)
         map_info2 = deepcopy(self.__map)
-        if False: # 测试代码，测试的时候改成False
+        if True: # 测试代码，测试的时候改成False
             try:
                 with time_limit(self.__max_time, "player1"):
                     player1_actions = self.__player[0].player_func(map_info1)
