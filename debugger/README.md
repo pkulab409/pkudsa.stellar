@@ -1,5 +1,13 @@
 # 本地调试用代码
 
+## TL;DR
+* 跑`debuggerCmd.py`
+    * 成功运行: 获得记录json
+    * 报错: 自行debug
+* 跑`debugVisualizer.py`
+    * 成功运行: 看可视化记录
+    * 报错: 回到`debuggerCmd.py`debug
+
 ## 文件列表
 * `debuggerCmd.py`: 命令行调试工具
 * `debugVisualizer.py`: Flask可视化调试工具（需安装`flask`）
