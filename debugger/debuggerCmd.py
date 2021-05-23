@@ -1,5 +1,6 @@
 import os, sys, ast, traceback, json
 from tkinter import filedialog
+from copy import deepcopy
 
 ### ========= 配置区域 =========
 # 源代码路径，若更改本文件与src目录相对位置需更改该参数
@@ -24,6 +25,7 @@ if '初始配置':
     # 导入模块
     from GameCore import Game
     import config
+    from TimeLimit import time_limit
     from HexagonForce import Generate_Hexagon
     if 'disable print':
         import HexagonForce
@@ -106,6 +108,21 @@ class GameWithModule(Game):
         if self._Game__winner not in (0, 1):
             self._Game__winner = None
         self.map['winner'] = self._Game__winner
+
+    def next_step(self):
+        """
+        报错跳过改为原地抛出异常中断
+        """
+        map_info1 = deepcopy(self._Game__map)
+        map_info2 = deepcopy(self._Game__map)
+        with time_limit(self._Game__max_time, "player1"):
+            player1_actions = self._Game__player[0].player_func(map_info1)
+        with time_limit(self._Game__max_time, "player2"):
+            player2_actions = self._Game__player[1].player_func(map_info2)
+
+        # 历史地图字典，存入列表
+        self.map["history"].append(
+            self._Game__map.update(player1_actions, player2_actions))
 
 
 def ensure_players():
