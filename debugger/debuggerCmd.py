@@ -22,9 +22,9 @@ if '初始配置':
     sys.path.append(os.path.abspath(SRC_PATH))  # 链接src目录
     # 获取初始玩家代码路径
     PLAYERS = [PLAYER1_PATH, PLAYER2_PATH]
-    for idx in 1, 2:
-        if len(sys.argv) > idx:
-            PLAYERS[i - 1] = PLAYERS[i - 1] or sys.argv[idx]
+    for i in 1, 2:
+        if len(sys.argv) > i:
+            PLAYERS[i - 1] = PLAYERS[i - 1] or sys.argv[i]
     # 导入模块
     from GameCore import Game
     import config
