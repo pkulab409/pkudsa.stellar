@@ -15,7 +15,7 @@ PLAYER2_PATH = ''
 # 比赛记录输出位置
 OUTPUT_DIR = './output.json'
 # 是否用tkinter dialog选择文件
-USE_DIALOG = True
+USE_DIALOG = (os.sys.platform == 'win32')
 ### ========= 配置结束 =========
 
 if '初始配置':
