@@ -12,14 +12,14 @@ class GameMap:
 
             nodes存储了地图的所有节点，而具体数据存储在各个node中，详细数据请参见Node class
 
-            需要主要的是，nodes[0]为无用节点，仅作为占位使用，对于节点的计数从1开始，这是为了与node.number属性保持一致
+            需要注意的是，nodes[0]为无用节点，仅作为占位使用，对于节点的计数从1开始，这是为了与node.number属性保持一致
         Args:
             design (dict): 地图文件中的字典
         """
         self.xy = design["xy"]
         design = design["design"]
         self.N = len(design) # 节点数，增加代码可读性
-        self.nodes = [Node(i) for i in range(self.N+2)]
+        self.nodes = [Node(i) for i in range(self.N+1)]
         self.nodes[1].set_power(INIT_POWER_1, True)
         self.nodes[self.N].set_power(INIT_POWER_2, True)
 
