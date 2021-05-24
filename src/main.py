@@ -8,7 +8,7 @@ from HexagonForce import Generate_Hexagon
 
 cnt = [0, 0]
 #player_file1, player_flie2 = sys.argv[1], sys.argv[2]
-player_file1, player_flie2 = "XHZAI一代", "XHZAI一代"
+player_file1, player_flie2 = "stupidAI", "stupidAI"
 print(player_file1, player_flie2)
 
 if __name__ == '__main__':
