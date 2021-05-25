@@ -74,7 +74,7 @@ class GameWithModule(Game):
             params: 可重载比赛参数
         """
         # 创建地图
-        maps = Generate_Hexagon(4, 0.20, 0.20)
+        maps = Generate_Hexagon(7, 0.35, 0.10)
 
         # 父类初始化
         super().__init__(*names, maps)
