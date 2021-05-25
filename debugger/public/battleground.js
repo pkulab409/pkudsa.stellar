@@ -52,7 +52,7 @@ function loadMap(data) {
         .append("circle")
         .attr("id", d => "node-" + d.name)
         .attr("r", (d, i) => {
-            const r = Math.max(...d.power);
+            const r = d.power[0] + d.power[1];
             return normalize(r);
         })
         .classed("circle", true)
@@ -83,9 +83,10 @@ function loadMap(data) {
         .style("font-size", "2em")
         //.attr("dominant-baseline", "top")
         .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
         .style("fill", (d, i) => colors[d.owner + 1][3])
         .text(d => {
-            const value = Math.max(...d.power);
+            const value = d.power[0] + d.power[1];
             return value > 0 ? value.toFixed(2) : '';
         });
 
@@ -109,7 +110,7 @@ function loadMap(data) {
             .attr("cy", d => d.y);
 
         text.attr("x", d => d.x)
-            .attr("y", d => d.y + 10);
+            .attr("y", d => d.y);
     }
 
     function onclick(event, d) {
@@ -164,13 +165,39 @@ function dropHandler(ev) {
 }
 
 function updateMap(data) {
+    const battle = [];
+    Object.values(data.power).forEach((power, index) => {
+        if (power[0] > 0 && power[1] > 0) {
+            battle.push(index + 1);
+        }
+    });
+    if (battle.length > 0) {
+        d3.select(".layout")
+            .selectAll(".battle")
+            .data(battle)
+            .enter()
+            .append("text")
+            .text("\uf71d")
+            .style("font-size", "0px")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .classed("fas", true)
+            .style("fill", "#FFE87C")
+            .style("fill-opacity", "0.7")
+            .attr("x", d => d3.select("#node-" + d).attr("cx"))
+            .attr("y", d => d3.select("#node-" + d).attr("cy"))
+            .transition()
+            .duration(TRANSITION_ARMY_MOVE)
+            .style("font-size", NODE_SIZE + "px")
+            .remove();
+    }
 
     d3.select(".layout")
         .selectAll(".circle")
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
         .attr("r", (d, i) => {
-            const r = Math.max(...data.power[i + 1]);
+            const r = data.power[i + 1][0] + data.power[i + 1][1];
             return normalize(r);
         })
         .style("fill", (d, i) => colors[data.owner[i + 1] + 1][d.type === "Base" ? 0 : 1]);
@@ -178,7 +205,7 @@ function updateMap(data) {
     d3.select(".layout")
         .selectAll(".text")
         .each(function(d, i) {
-            const end = Math.max(...data.power[i + 1]);
+            const end = data.power[i + 1][0] + data.power[i + 1][1];
             const start = d3.select(this).text() || 0;
             const transition = d3.select(this)
                 .transition()
@@ -248,7 +275,6 @@ function loadData(db) {
 
 function userAction(data) {
     const army = [];
-    const battle = [];
     Object.values(data.actions).forEach((action, owner) => {
         for (let [from, to, radius] of action) {
             army.push({
@@ -259,12 +285,6 @@ function userAction(data) {
             });
         }
     });
-    Object.values(data.power).forEach((power, index) => {
-        if (power[0] > 0 && power[1] > 0) {
-            battle.push(index);
-        }
-    });
-    console.log(battle);
     if (army.length === 0) return updateMap(data);
 
     d3.select(".layout")
@@ -274,6 +294,8 @@ function userAction(data) {
         .append("text")
         .text("\uf135")
         .style("font-size", "0px")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
         .classed("fas", true)
         .style("fill", (d, i) => colors[d.owner + 1][3])
         .style("fill-opacity", "0.7")
@@ -281,8 +303,7 @@ function userAction(data) {
         .attr("y", d => d3.select("#node-" + d.from).attr("cy"))
         .transition()
         .duration(TRANSITION_ARMY_FADE)
-        .style("font-size", d => normalize(d.radius))
-        .attr("text-anchor", "middle")
+        .style("font-size", d => normalize(d.radius * 2))
         .transition()
         .duration(TRANSITION_ARMY_MOVE)
         .attr("x", d => d3.select("#node-" + d.to).attr("cx"))
