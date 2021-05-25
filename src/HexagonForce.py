@@ -1,6 +1,11 @@
 from random import random,choices
 
 def Generate_Hexagon(a: int, p_node: float = 0.1, p_edge: float = 0.1):
+    """
+    a代表六边形的边长（一条边上的节点数）
+    p_node代表一个节点被删除的概率
+    p_edge代表一条边被删除的概率
+    """
     result = Generate_Hexagon_Try(a,p_node,p_edge)
     while result==-1:
         result = Generate_Hexagon_Try(a,p_node,p_edge)
@@ -13,7 +18,7 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
     p_edge代表一条边被删除的概率
     """
     N_max = (3*a-2)*(a-1)+(2*a-1)
-    l = 3/a # 可视化的边长
+    l = 2/(a-1) # 可视化的边长
     #print("N_max ==",N_max)#
     design = {}
     xy = {}
@@ -47,7 +52,7 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
         for j in range(1, N+1):
             if i==j:
                 continue
-            if (xy[i][0]-xy[j][0])**2+(xy[i][1]-xy[j][1])**2 < 1.5*l: # 在图上是相邻节点
+            if (xy[i][0]-xy[j][0])**2+(xy[i][1]-xy[j][1])**2 < 1*l: # 在图上是相邻节点
                 if random()>=p_edge:
                     design[i][j] = 0 # 这里0是过路费，之后可以改，都可以改！
                     design[j][i] = 0
