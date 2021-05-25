@@ -3,7 +3,8 @@ console.log("PKU DSA 21 Stellar VIS. Powered by Mimi.");
 let width = window.innerWidth;
 let height = window.innerHeight;
 
-let node_size = 5;
+let MARGIN = 1 / 14;
+let NODE_SIZE = Math.min(width, height) * MARGIN * 0.8;
 
 const colors = [
     ['#93c4d2', '#b9e5dd', '#ffd3bf', '#ffa59e'], ['#00429d', '#3761ab', '#5681b9', '#73a2c6'], ['#f4777f', '#dd4c65', '#be214d', '#93003a']
@@ -16,10 +17,10 @@ const TRANSITION_COLOR_TEXT = 500;
 const TRANSITION_ARMY_FADE = 250;
 const TRANSITION_ARMY_MOVE = 1000;
 
-function normalize(r, factor = 1) {
-    if (r < 5) r = 5;
+function normalize(r) {
+    if (r < 20) r = 20;
     if (r > 100) r = 100;
-    return factor * Math.log(r) + "em";
+    return (Math.log(r) - Math.log(5)) / (Math.log(100) - Math.log(5)) * NODE_SIZE + "px";
 }
 
 d3.select("#preview")
@@ -232,8 +233,8 @@ function loadData(db) {
     const graph = db.map;
     document.getElementById("help").style.display = "none";
     const nodes = Object.keys(database[0].owner).map(node => {
-        const fx = graph.xy ? (graph.xy[node][0] / 4 + 0.5) * width * 0.8 + width * 0.1 : null;
-        const fy = graph.xy ? (graph.xy[node][1] / 4 + 0.5) * height * 0.8 + height * 0.1 : null;
+        const fx = graph.xy ? (graph.xy[node][0] / 4.5 + 0.5) * width * (1 - 2 * MARGIN) + width * MARGIN : null;
+        const fy = graph.xy ? (graph.xy[node][1] / 4.5 + 0.5) * height * (1 - 2 * MARGIN) + height * MARGIN : null;
         return {
             name: node,
             type: database[0].owner[node] === -1 ? "Fort" : "Base",
@@ -286,7 +287,7 @@ function userAction(data) {
         .enter()
         .append("text")
         .text("\uf135")
-        .style("font-size", "0em")
+        .style("font-size", "0px")
         .classed("fas", true)
         .style("fill", function(d, i) { return colors[d.owner + 1][2]; })
         .style("fill-opacity", "0.7")
@@ -304,7 +305,7 @@ function userAction(data) {
         .attr("y", function(d) { return d.y2; })
         .transition()
         .duration(TRANSITION_ARMY_FADE)
-        .style("font-size", "0em")
+        .style("font-size", "0px")
         .remove()
         .on("end", () => {
             updateMap(data);
