@@ -18,7 +18,7 @@ def Generate_Hexagon_Try(a: int, p_node: float = 0.1, p_edge: float = 0.1):
     p_edge代表一条边被删除的概率
     """
     N_max = (3*a-2)*(a-1)+(2*a-1)
-    l = 2.4/(a-1) # 可视化的边长
+    l = 2/(a-1) # 可视化的边长
     #print("N_max ==",N_max)#
     design = {}
     xy = {}
