@@ -7,7 +7,7 @@ let MARGIN = 1 / 14;
 let NODE_SIZE = Math.min(width, height) * MARGIN * 0.8;
 
 const colors = [
-    d3.schemeGreens[6].reverse(), d3.schemeBlues[6].reverse(), d3.schemeReds[6].reverse()
+    d3.schemeGreys[6].reverse(), d3.schemeBlues[6].reverse(), d3.schemeReds[6].reverse()
 ];
 
 let frame = 0;
