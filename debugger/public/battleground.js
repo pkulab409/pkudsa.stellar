@@ -50,20 +50,20 @@ function loadMap(data) {
         .data(nodes)
         .enter()
         .append("circle")
-        .attr("id", function(d) { return "node-" + d.name; })
-        .attr("r", function(d, i) {
+        .attr("id", d => "node-" + d.name)
+        .attr("r", (d, i) => {
             const r = Math.max(...d.power);
             return normalize(r);
         })
         .classed("circle", true)
-        .style("fill", function(d, i) { return colors[d.owner + 1][d.type === "Base" ? 0 : 1]; })
+        .style("fill", (d, i) => colors[d.owner + 1][d.type === "Base" ? 0 : 1])
         .on("click", onclick)
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
 
-    d3.selectAll(".layout .fab").each(function(d, i) {
+    d3.selectAll(".layout .fab").each((d, i) => {
         if (d.fx || d.fy) return;
         if (d.owner === 0) {
             d.fx = width * 0.15;
@@ -83,10 +83,8 @@ function loadMap(data) {
         .style("font-size", "2em")
         //.attr("dominant-baseline", "top")
         .attr("text-anchor", "middle")
-        .style("fill", function(d, i) { return colors[d.owner + 1][3]; })
-        .text(function(d) {
-            return Math.max(...d.power).toFixed(2);
-        });
+        .style("fill", (d, i) => colors[d.owner + 1][3])
+        .text(d => Math.max(...d.power).toFixed(2));
 
     const simulation = d3.forceSimulation(nodes)
         .velocityDecay(0.2)
@@ -99,16 +97,16 @@ function loadMap(data) {
         .on("tick", ticked);
 
     function ticked() {
-        link.attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
+        link.attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
 
-        circle.attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
+        circle.attr("cx", d =>  d.x)
+            .attr("cy", d =>  d.y);
 
-        text.attr("x", function(d) { return d.x; })
-            .attr("y", function(d) { return d.y + 10; });
+        text.attr("x", d =>  d.x)
+            .attr("y", d =>  d.y + 10);
     }
 
     function onclick(event, d) {
@@ -146,7 +144,7 @@ function dropHandler(ev) {
         // Use DataTransferItemList interface to access the file(s)
         const file = ev.dataTransfer.files[0];
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = event => {
             if (file.type === "application/json") {
                 loadData(JSON.parse(event.target.result));
             } else {
@@ -168,28 +166,28 @@ function updateMap(data) {
         .selectAll(".circle")
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
-        .attr("r", function(d, i) {
+        .attr("r", (d, i) => {
             const r = Math.max(...data.power[i + 1]);
             return normalize(r);
         })
-        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][d.type === "Base" ? 0 : 1]; });
+        .style("fill", (d, i) => colors[data.owner[i + 1] + 1][d.type === "Base" ? 0 : 1]);
 
     d3.select(".layout")
         .selectAll(".text")
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
-        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][3]; })
+        .style("fill", (d, i) => colors[data.owner[i + 1] + 1][3])
         .textTween(function(d, i) {
             const f = Math.max(...data.power[i + 1]);
             const interpolate = d3.interpolate(d3.select(this).text(), f);
-            return function(t) { return interpolate(t).toFixed(2); };
+            return t => interpolate(t).toFixed(2);
         });
 
     d3.select(".layout")
         .selectAll(".link")
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
-        .attr("stroke", function(d, i) {
+        .attr("stroke", (d, i) => {
             if (data.owner[d.source.name] === 0 && data.owner[d.target.name] === 0) return colors[1][2];
             if (data.owner[d.source.name] === 1 && data.owner[d.target.name] === 1) return colors[2][2];
             return colors[0][2];
@@ -239,7 +237,6 @@ function userAction(data) {
     Object.values(data.actions).forEach((action, owner) => {
         for (let [from, to, radius] of action) {
 
-            //console.log(from, to, radius);
             x1 = d3.select("#node-" + from).attr("cx");
             x2 = d3.select("#node-" + to).attr("cx");
             y1 = d3.select("#node-" + from).attr("cy");
@@ -256,7 +253,7 @@ function userAction(data) {
     });
     if (army.length === 0) return updateMap(data);
 
-    const node = d3.select(".layout")
+    d3.select(".layout")
         .selectAll(".army")
         .data(army)
         .enter()
@@ -264,20 +261,18 @@ function userAction(data) {
         .text("\uf135")
         .style("font-size", "0px")
         .classed("fas", true)
-        .style("fill", function(d, i) { return colors[d.owner + 1][3]; })
+        .style("fill", (d, i) => colors[d.owner + 1][3])
         .style("fill-opacity", "0.7")
-        .attr("x", function(d) { return d.x1; })
-        .attr("y", function(d) { return d.y1; })
+        .attr("x", d => d.x1)
+        .attr("y", d => d.y1)
         .transition()
         .duration(TRANSITION_ARMY_FADE)
-        .style("font-size", function(d) {
-            return normalize(d.radius);
-        })
+        .style("font-size", d => normalize(d.radius))
         .attr("text-anchor", "middle")
         .transition()
         .duration(TRANSITION_ARMY_MOVE)
-        .attr("x", function(d) { return d.x2; })
-        .attr("y", function(d) { return d.y2; })
+        .attr("x", d => d.x2)
+        .attr("y", d => d.y2)
         .transition()
         .duration(TRANSITION_ARMY_FADE)
         .style("font-size", "0px")
