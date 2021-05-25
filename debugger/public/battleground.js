@@ -102,11 +102,11 @@ function loadMap(data) {
             .attr("x2", d => d.target.x)
             .attr("y2", d => d.target.y);
 
-        circle.attr("cx", d =>  d.x)
-            .attr("cy", d =>  d.y);
+        circle.attr("cx", d => d.x)
+            .attr("cy", d => d.y);
 
-        text.attr("x", d =>  d.x)
-            .attr("y", d =>  d.y + 10);
+        text.attr("x", d => d.x)
+            .attr("y", d => d.y + 10);
     }
 
     function onclick(event, d) {
@@ -205,9 +205,11 @@ function loadData(db) {
     updateFrame();
     const graph = db.map;
     document.getElementById("help").style.display = "none";
+    MARGIN = 0.5 / new Set(Object.values(graph.xy).map(coord => coord[0])).size;
+    NODE_SIZE = Math.min(width, height) * MARGIN * 0.8;
     const nodes = Object.keys(database[0].owner).map(node => {
-        const fx = graph.xy ? (graph.xy[node][0] / 4.5 + 0.5) * width * (1 - 2 * MARGIN) + width * MARGIN : null;
-        const fy = graph.xy ? (graph.xy[node][1] / 4.5 + 0.5) * height * (1 - 2 * MARGIN) + height * MARGIN : null;
+        const fx = graph.xy ? (graph.xy[node][0] / 4 + 0.5) * width * (1 - 2 * MARGIN) + width * MARGIN : null;
+        const fy = graph.xy ? (graph.xy[node][1] / 4 + 0.5) * height * (1 - 2 * MARGIN) + height * MARGIN : null;
         return {
             name: node,
             type: database[0].owner[node] === -1 ? "Fort" : "Base",
@@ -234,6 +236,7 @@ function loadData(db) {
 
 function userAction(data) {
     const army = [];
+    const battle = [];
     Object.values(data.actions).forEach((action, owner) => {
         for (let [from, to, radius] of action) {
 
@@ -251,6 +254,12 @@ function userAction(data) {
             });
         }
     });
+    Object.values(data.power).forEach((power, index) => {
+        if (power[0] > 0 && power[1] > 0) {
+            battle.push(index);
+        }
+    });
+    console.log(battle);
     if (army.length === 0) return updateMap(data);
 
     d3.select(".layout")
