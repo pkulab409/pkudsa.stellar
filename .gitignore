@@ -2,3 +2,5 @@
 *.json
 .vscode
 __pycache__
+src/AIs/
+debugger/
