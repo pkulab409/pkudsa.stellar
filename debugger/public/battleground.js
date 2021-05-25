@@ -7,7 +7,7 @@ let MARGIN = 1 / 14;
 let NODE_SIZE = Math.min(width, height) * MARGIN * 0.8;
 
 const colors = [
-    ['#93c4d2', '#b9e5dd', '#ffd3bf', '#ffa59e'], ['#00429d', '#3761ab', '#5681b9', '#73a2c6'], ['#f4777f', '#dd4c65', '#be214d', '#93003a']
+    d3.schemeGreens[6].reverse(), d3.schemeBlues[6].reverse(), d3.schemeReds[6].reverse()
 ];
 
 let frame = 0;
@@ -43,41 +43,25 @@ function loadMap(data) {
         .append("line")
         .classed("link", true)
         .attr("stroke-width", 5)
-        .attr("stroke", colors[0][1]);
+        .attr("stroke", colors[0][2]);
 
     const circle = d3.select(".layout")
         .selectAll(".circle")
         .data(nodes)
         .enter()
         .append("circle")
+        .attr("id", function(d) { return "node-" + d.name; })
         .attr("r", function(d, i) {
             const r = Math.max(...d.power);
             return normalize(r);
         })
         .classed("circle", true)
-        .style("fill", function(d, i) { return colors[d.owner + 1][0]; })
+        .style("fill", function(d, i) { return colors[d.owner + 1][d.type === "Base" ? 0 : 1]; })
         .on("click", onclick)
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
-
-    const node = d3.select(".layout")
-        .selectAll(".node")
-        .data(nodes)
-        .enter()
-        .append("text")
-        //.text(function(d) { return d.type === "Base" ? "\uf286" : "\uf447"; })
-        .style("font-size", "5em")
-        //.attr("dominant-baseline", "middle")
-        .attr("text-anchor", "middle")
-        //.attr("font-family", "Font Awesome 5 Free")
-        .classed("node", true)
-        .attr("id", function(d) { return "node-" + d.name; })
-        .style("fill", function(d, i) { return colors[d.owner + 1][0]; })
-        .each(function(d) {
-            d3.select(this).classed(d.type === "Base" ? "fab" : "fas", true);
-        });
 
     d3.selectAll(".layout .fab").each(function(d, i) {
         if (d.fx || d.fy) return;
@@ -99,7 +83,7 @@ function loadMap(data) {
         .style("font-size", "2em")
         //.attr("dominant-baseline", "top")
         .attr("text-anchor", "middle")
-        .style("fill", function(d, i) { return colors[d.owner + 1][2]; })
+        .style("fill", function(d, i) { return colors[d.owner + 1][3]; })
         .text(function(d) {
             return Math.max(...d.power).toFixed(2);
         });
@@ -119,9 +103,6 @@ function loadMap(data) {
             .attr("y1", function(d) { return d.source.y; })
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; });
-
-        node.attr("x", function(d) { return d.x; })
-            .attr("y", function(d) { return d.y; });
 
         circle.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
@@ -184,12 +165,6 @@ function dropHandler(ev) {
 function updateMap(data) {
 
     d3.select(".layout")
-        .selectAll(".node")
-        .transition()
-        .duration(TRANSITION_COLOR_TEXT)
-        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][0]; });
-
-    d3.select(".layout")
         .selectAll(".circle")
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
@@ -197,13 +172,13 @@ function updateMap(data) {
             const r = Math.max(...data.power[i + 1]);
             return normalize(r);
         })
-        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][0]; });
+        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][d.type === "Base" ? 0 : 1]; });
 
     d3.select(".layout")
         .selectAll(".text")
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
-        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][2]; })
+        .style("fill", function(d, i) { return colors[data.owner[i + 1] + 1][3]; })
         .textTween(function(d, i) {
             const f = Math.max(...data.power[i + 1]);
             const interpolate = d3.interpolate(d3.select(this).text(), f);
@@ -215,9 +190,9 @@ function updateMap(data) {
         .transition()
         .duration(TRANSITION_COLOR_TEXT)
         .attr("stroke", function(d, i) {
-            if (data.owner[d.source.name] === 0 && data.owner[d.target.name] === 0) return colors[1][1];
-            if (data.owner[d.source.name] === 1 && data.owner[d.target.name] === 1) return colors[2][1];
-            return colors[0][1];
+            if (data.owner[d.source.name] === 0 && data.owner[d.target.name] === 0) return colors[1][2];
+            if (data.owner[d.source.name] === 1 && data.owner[d.target.name] === 1) return colors[2][2];
+            return colors[0][2];
         });
 }
 
@@ -265,10 +240,10 @@ function userAction(data) {
         for (let [from, to, radius] of action) {
 
             //console.log(from, to, radius);
-            x1 = d3.select("#node-" + from).attr("x");
-            x2 = d3.select("#node-" + to).attr("x");
-            y1 = d3.select("#node-" + from).attr("y");
-            y2 = d3.select("#node-" + to).attr("y");
+            x1 = d3.select("#node-" + from).attr("cx");
+            x2 = d3.select("#node-" + to).attr("cx");
+            y1 = d3.select("#node-" + from).attr("cy");
+            y2 = d3.select("#node-" + to).attr("cy");
             army.push({
                 x1,
                 x2,
@@ -289,7 +264,7 @@ function userAction(data) {
         .text("\uf135")
         .style("font-size", "0px")
         .classed("fas", true)
-        .style("fill", function(d, i) { return colors[d.owner + 1][2]; })
+        .style("fill", function(d, i) { return colors[d.owner + 1][3]; })
         .style("fill-opacity", "0.7")
         .attr("x", function(d) { return d.x1; })
         .attr("y", function(d) { return d.y1; })
@@ -332,7 +307,7 @@ function backward() {
 document.querySelector(".fa-step-backward").addEventListener("click", backward);
 
 document.querySelector(".fa-question-circle").addEventListener("click", () => {
-    alert("可以拖动节点到固定位置。单击节点将其复位。颜色代表节点的所有者。数字代表兵力。点击对应的按钮或键盘上的左、右箭头键来显示上一帧/下一帧。");
+    alert("可以拖动节点到固定位置。单击节点将其复位。颜色代表节点的所有者。数字代表兵力。点击对应的按钮或键盘上的左、右箭头键来显示上一帧/下一帧。将图片拖入网页中可设置为背景图。");
 });
 
 document.addEventListener("keydown", event => {
