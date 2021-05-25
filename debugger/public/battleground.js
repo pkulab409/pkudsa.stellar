@@ -84,7 +84,10 @@ function loadMap(data) {
         //.attr("dominant-baseline", "top")
         .attr("text-anchor", "middle")
         .style("fill", (d, i) => colors[d.owner + 1][3])
-        .text(d => Math.max(...d.power).toFixed(2));
+        .text(d => {
+            const value = Math.max(...d.power);
+            return value > 0 ? value.toFixed(2) : '';
+        });
 
     const simulation = d3.forceSimulation(nodes)
         .velocityDecay(0.2)
@@ -174,13 +177,22 @@ function updateMap(data) {
 
     d3.select(".layout")
         .selectAll(".text")
-        .transition()
-        .duration(TRANSITION_COLOR_TEXT)
-        .style("fill", (d, i) => colors[data.owner[i + 1] + 1][3])
-        .textTween(function(d, i) {
-            const f = Math.max(...data.power[i + 1]);
-            const interpolate = d3.interpolate(d3.select(this).text(), f);
-            return t => interpolate(t).toFixed(2);
+        .each(function(d, i) {
+            const end = Math.max(...data.power[i + 1]);
+            const start = d3.select(this).text() || 0;
+            const transition = d3.select(this)
+                .transition()
+                .duration(TRANSITION_COLOR_TEXT)
+                .style("fill", () => colors[data.owner[i + 1] + 1][3])
+            if (end !== start) {
+                transition.textTween(() => {
+                    const interpolate = d3.interpolate(start, end);
+                    return t => interpolate(t).toFixed(2);
+                })
+                .on("end", function() {
+                    if (end === 0) d3.select(this).text('');
+                });
+            }
         });
 
     d3.select(".layout")
