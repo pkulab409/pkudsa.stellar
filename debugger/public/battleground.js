@@ -239,16 +239,9 @@ function userAction(data) {
     const battle = [];
     Object.values(data.actions).forEach((action, owner) => {
         for (let [from, to, radius] of action) {
-
-            x1 = d3.select("#node-" + from).attr("cx");
-            x2 = d3.select("#node-" + to).attr("cx");
-            y1 = d3.select("#node-" + from).attr("cy");
-            y2 = d3.select("#node-" + to).attr("cy");
             army.push({
-                x1,
-                x2,
-                y1,
-                y2,
+                from,
+                to,
                 radius,
                 owner
             });
@@ -272,22 +265,22 @@ function userAction(data) {
         .classed("fas", true)
         .style("fill", (d, i) => colors[d.owner + 1][3])
         .style("fill-opacity", "0.7")
-        .attr("x", d => d.x1)
-        .attr("y", d => d.y1)
+        .attr("x", d => d3.select("#node-" + d.from).attr("cx"))
+        .attr("y", d => d3.select("#node-" + d.from).attr("cy"))
         .transition()
         .duration(TRANSITION_ARMY_FADE)
         .style("font-size", d => normalize(d.radius))
         .attr("text-anchor", "middle")
         .transition()
         .duration(TRANSITION_ARMY_MOVE)
-        .attr("x", d => d.x2)
-        .attr("y", d => d.y2)
+        .attr("x", d => d3.select("#node-" + d.to).attr("cx"))
+        .attr("y", d => d3.select("#node-" + d.to).attr("cy"))
         .transition()
         .duration(TRANSITION_ARMY_FADE)
         .style("font-size", "0px")
         .remove()
         .on("end", () => {
-            updateMap(data);
+            setTimeout(() => updateMap(data), TRANSITION_ARMY_FADE);
         });
 }
 
