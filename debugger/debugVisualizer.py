@@ -1,11 +1,7 @@
 from debuggerCmd import GameWithModule, ensure_players, json
-from server import app, html, webbrowser
+from server import app, webbrowser
 
-import server
-server.html = server.html.replace('battle.json', 'battle_debug.json')
-
-
-@app.route('/battle_debug.json')
+@app.route('/battle.json')
 def battledebug():
     g = GameWithModule(*ensure_players(), {})
     g.run()

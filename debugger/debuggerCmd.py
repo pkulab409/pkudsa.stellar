@@ -145,15 +145,15 @@ def ensure_players():
                 if PLAYERS[i]:
                     print('*** 玩家%d代码 (%s) 无效，报错如下： ***' % (i + 1, PLAYERS[i]))
                     traceback.print_exc()
-                print('请选择玩家%d代码' % (i + 1))
                 if USE_DIALOG:
+                    print('请选择玩家%d代码' % (i + 1))
                     PLAYERS[i] = filedialog.askopenfilename(
                         initialdir=_LAST_DIR,
                         title="选择玩家%d代码" % (i + 1),
                         filetypes=(("py文件", "*.py"), ("全部", "*.*")))
                     _LAST_DIR = os.path.dirname(PLAYERS[i])
                 else:
-                    PLAYERS[i] = input()
+                    PLAYERS[i] = input('请选择玩家%d代码：' % (i + 1))
             else:
                 PLAYER_MODULES[i] = mod
                 PLAYER_NAMES[i] = player_name
