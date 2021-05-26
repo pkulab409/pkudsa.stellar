@@ -12,6 +12,7 @@ const colors = [
 
 let frame = 0;
 let database = [];
+let playing = false;
 
 const TRANSITION_COLOR_TEXT = 500;
 const TRANSITION_ARMY_FADE = 250;
@@ -164,7 +165,7 @@ function dropHandler(ev) {
     }
 }
 
-function updateMap(data) {
+async function updateMap(data) {
     const battle = [];
     Object.values(data.power).forEach((power, index) => {
         if (power[0] > 0 && power[1] > 0) {
@@ -231,6 +232,10 @@ function updateMap(data) {
             if (data.owner[d.source.name] === 1 && data.owner[d.target.name] === 1) return colors[2][2];
             return colors[0][2];
         });
+
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, TRANSITION_COLOR_TEXT);
+    });
 }
 
 function updateFrame() {
@@ -239,6 +244,7 @@ function updateFrame() {
 
 function loadData(db) {
     database = db.history.flat();
+    for (let i of [0, 1]) database.shift(); // 移除首帧2个重复画面
     console.log(database);
     frame = 0;
     updateFrame();
@@ -273,7 +279,7 @@ function loadData(db) {
     });
 }
 
-function userAction(data) {
+async function userAction(data) {
     const army = [];
     Object.values(data.actions).forEach((action, owner) => {
         for (let [from, to, radius] of action) {
@@ -285,56 +291,87 @@ function userAction(data) {
             });
         }
     });
-    if (army.length === 0) return updateMap(data);
+    if (army.length === 0) {
+        await updateMap(data);
+        return;
+    }
 
-    d3.select(".layout")
-        .selectAll(".army")
-        .data(army)
-        .enter()
-        .append("text")
-        .text("\uf135")
-        .style("font-size", "0px")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .classed("fas", true)
-        .style("fill", (d, i) => colors[d.owner + 1][3])
-        .style("fill-opacity", "0.7")
-        .attr("x", d => d3.select("#node-" + d.from).attr("cx"))
-        .attr("y", d => d3.select("#node-" + d.from).attr("cy"))
-        .transition()
-        .duration(TRANSITION_ARMY_FADE)
-        .style("font-size", d => normalize(d.radius * 2))
-        .transition()
-        .duration(TRANSITION_ARMY_MOVE)
-        .attr("x", d => d3.select("#node-" + d.to).attr("cx"))
-        .attr("y", d => d3.select("#node-" + d.to).attr("cy"))
-        .transition()
-        .duration(TRANSITION_ARMY_FADE)
-        .style("font-size", "0px")
-        .remove()
-        .on("end", () => {
-            setTimeout(() => updateMap(data), TRANSITION_ARMY_FADE);
-        });
+    return new Promise((resolve, reject) => {
+        d3.select(".layout")
+            .selectAll(".army")
+            .data(army)
+            .enter()
+            .append("text")
+            .text("\uf135")
+            .style("font-size", "0px")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .classed("fas", true)
+            .style("fill", (d, i) => colors[d.owner + 1][3])
+            .style("fill-opacity", "0.7")
+            .attr("x", d => d3.select("#node-" + d.from).attr("cx"))
+            .attr("y", d => d3.select("#node-" + d.from).attr("cy"))
+            .transition()
+            .duration(TRANSITION_ARMY_FADE)
+            .style("font-size", d => normalize(d.radius * 2))
+            .transition()
+            .duration(TRANSITION_ARMY_MOVE)
+            .attr("x", d => d3.select("#node-" + d.to).attr("cx"))
+            .attr("y", d => d3.select("#node-" + d.to).attr("cy"))
+            .transition()
+            .duration(TRANSITION_ARMY_FADE)
+            .style("font-size", "0px")
+            .remove()
+            .on("end", () => {
+                setTimeout(async () => {
+                    await updateMap(data);
+                    resolve();
+                }, TRANSITION_ARMY_FADE);
+            });
+    });
 }
 
 document.body.addEventListener("dragover", event => event.preventDefault(), false);
 document.body.addEventListener("drop", dropHandler, false);
 
-function forward() {
-    if (!database.length || frame === database.length - 1) return;
+async function forward() {
+    if (!database.length || frame === database.length - 1) return false;
     frame++;
     updateFrame();
-    userAction(database[frame]);
+    await userAction(database[frame]);
+    return true;
 }
 document.querySelector(".fa-step-forward").addEventListener("click", forward);
 
-function backward() {
-    if (!database.length || frame === 0) return;
+async function backward() {
+    if (!database.length || frame === 0) return false;
     frame--;
     updateFrame();
-    updateMap(database[frame]);
+    await updateMap(database[frame]);
+    return true;
 }
 document.querySelector(".fa-step-backward").addEventListener("click", backward);
+
+async function play(reverse = false) {
+    if (!database.length) return;
+    playing = true;
+    while (playing && frame >= 0 && frame < database.length) {
+        const result = reverse ? await backward() : await forward();
+        playing = playing && result;
+    };
+    playing = false;
+}
+document.querySelector(".fa-forward").addEventListener("click", () => {
+    play();
+});
+document.querySelector(".fa-backward").addEventListener("click", () => {
+    play(true);
+});
+
+function pause() {
+    playing = false;
+}
+document.querySelector(".fa-pause").addEventListener("click", pause);
 
 document.querySelector(".fa-question-circle").addEventListener("click", () => {
     alert("可以拖动节点到固定位置。单击节点将其复位。颜色代表节点的所有者。数字代表兵力。点击对应的按钮或键盘上的左、右箭头键来显示上一帧/下一帧。将图片拖入网页中可设置为背景图。");
