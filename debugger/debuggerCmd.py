@@ -3,7 +3,7 @@ from tkinter import filedialog
 from copy import deepcopy
 
 # 更改根目录
-os.chdir(os.path.dirname(__file__))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 ### ========= 配置区域 =========
 # 源代码路径，若更改本文件与src目录相对位置需更改该参数
