@@ -13,7 +13,7 @@ class GameMap:
 
             nodes存储了地图的所有节点，而具体数据存储在各个node中，详细数据请参见Node class
 
-            需要注意的是，nodes[0]为无用节点，仅作为占位使用，对于节点的计数从1开始，这是为了与node.number属性保持一致
+            需要主要的是，nodes[0]为无用节点，仅作为占位使用，对于节点的计数从1开始，这是为了与node.number属性保持一致
         Args:
             design (dict): 地图文件中的字典
         """
@@ -59,16 +59,23 @@ class GameMap:
             RuntimeError: [description]
             RuntimeError: [description]   这一部分最后再写（
         """
+            
         # 检查输入是否是list
         if not isinstance(player_actionlist, list):
             raise RuntimeError('Judgement!!! Invalid input type!')
         sentPower = {}  # sentPower[i]代表每个节点派出去多少兵
+
         for player_action in player_actionlist:
+
             # 检测输入action是否是元组，并且长度为3
             if not isinstance(player_action, tuple):
                 raise RuntimeError("Judgement!!! Invalid input type! ")
             if len(player_action) != 3:
                 raise RuntimeError("Judgement!!! Invalid input length! ")
+
+            start = player_action[0]
+            end = player_action[1]
+            power = player_action[2]
             # 判断action的三个参数类型是否正确
             if not isinstance(player_action[0], int):
                 raise RuntimeError("Judgement!!! Invalid input type! ")
@@ -82,6 +89,11 @@ class GameMap:
             if player_action[0] < 1 or player_action[0] > self.N:
                 raise RuntimeError(
                     'Judgement!!! Invalid input target(out of range): %s' % str(player_action))
+
+            # 目标兵力节点与派出点不相连
+            if end not in self.nodes[start].get_next():
+                raise RuntimeError(
+                    'invalid move: no connection: %s' % str(player_action))
 
             # 检查move操作是否使得其余节点越界
             if player_action[0] not in sentPower:
@@ -109,22 +121,6 @@ class GameMap:
         start = player_action[0]
         end = player_action[1]
         power = player_action[2]
-        # 输入是否合法
-        if not (isinstance(tmp_player_id, int) and isinstance(start, int) and isinstance(end, int) and
-                (isinstance(power, float) or isinstance(power, int))):
-            raise RuntimeError('invalid input type: %s' % str(player_action))
-        # 派出兵力点不属于该玩家
-        if self.nodes[start].belong != tmp_player_id:
-            raise RuntimeError(
-                'invalid move: wrong basement: %s' % str(player_action))
-        # power超过兵力上限
-        if self.nodes[start].power[tmp_player_id] <= power:
-            raise RuntimeError(
-                'invalid input value(too much): %s' % str(player_action))
-        # 目标兵力节点与派出点不相连
-        if end not in self.nodes[start].get_next():
-            raise RuntimeError(
-                'invalid move: no connection: %s' % str(player_action))
 
         # 以下为行动主体函数
         tmp_pw = list(self.nodes[start].power)
@@ -184,10 +180,12 @@ class GameMap:
             self.__judge(player1_actions, 0)
         except:
             player1_actions = []
+        #self.__judge(player1_actions, 0) # Test########################################
         try:
             self.__judge(player2_actions, 1)
         except:
             player2_actions = []
+        #self.__judge(player2_actions, 1) ##############################################
 
         for action in player1_actions:
             self.__move(0, action)
