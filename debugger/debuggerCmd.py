@@ -91,10 +91,10 @@ class GameWithModule(Game):
         if any(errors):
             endgame = True
             if all(errors):
-                self.map['result'] = output_error(errors)
+                raise Exception(errors)
             else:
                 winner = int(bool(errors[0]))
-                self.map['result'] = output_error(errors[1 - winner])
+                raise Exception(errors[1 - winner])
             self.map['result'] = '初始化错误: %s' % self.map['result']
 
         # 强制初始化
