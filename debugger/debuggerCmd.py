@@ -81,21 +81,9 @@ class GameWithModule(Game):
 
         # 尝试实例化玩家类
         players = [None] * 2
-        errors = [None] * 2
         for i, mod in enumerate(modules):
-            try:
-                players[i] = mod.player_class(i)
-            except Exception as e:
-                errors[i] = e
+            players[i] = mod.player_class(i)
         endgame, winner = False, None
-        if any(errors):
-            endgame = True
-            if all(errors):
-                raise Exception(errors)
-            else:
-                winner = int(bool(errors[0]))
-                raise Exception(errors[1 - winner])
-            self.map['result'] = '初始化错误: %s' % self.map['result']
 
         # 强制初始化
         self.__dict__.update(
