@@ -23,6 +23,8 @@ class GameMap:
         self.nodes = [Node(i) for i in range(self.N+1)]
         self.nodes[1].set_power(INIT_POWER_1, True)
         self.nodes[self.N].set_power(INIT_POWER_2, True)
+        self.error1 = "玩家正常游戏"
+        self.error2 = "玩家正常游戏"
 
         for number in design.keys():
             for nextnumber in design[number].keys():
@@ -178,13 +180,15 @@ class GameMap:
         """
         try:
             self.__judge(player1_actions, 0)
-        except:
+        except Exception as ex:
             player1_actions = []
+            self.error1 = ex.message
         #self.__judge(player1_actions, 0) # Test########################################
         try:
             self.__judge(player2_actions, 1)
-        except:
+        except Exception as ex:
             player2_actions = []
+            self.error2 = ex.message
         #self.__judge(player2_actions, 1) ##############################################
 
         for action in player1_actions:
@@ -276,4 +280,6 @@ class GameMap:
             # 是float
             "limit": {i: self.nodes[i].power_limit for i in range(1, self.N+1)},
             "xy": self.xy,  # 地图每个节点可视化的坐标
+            "error1": self.error1, 
+            "error2": self.error2 #双方玩家运行的状态，为字符串，若有报错，则为报错信息，否则为“玩家正常游戏”
         }
