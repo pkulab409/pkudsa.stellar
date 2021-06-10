@@ -6,6 +6,9 @@ from config import POWER_LIMIT, INIT_POWER_1, INIT_POWER_2
 PLAYER_1 = 0
 PLAYER_2 = 1
 
+def stringfy_error(e):
+    return '%s: %s'%(type(e).__name__,e)
+
 
 class GameMap:
     def __init__(self, design: dict):
@@ -182,13 +185,13 @@ class GameMap:
             self.__judge(player1_actions, 0)
         except Exception as ex:
             player1_actions = []
-            self.error1 = ex.message
+            self.error1 = stringfy_error(ex)
         #self.__judge(player1_actions, 0) # Test########################################
         try:
             self.__judge(player2_actions, 1)
         except Exception as ex:
             player2_actions = []
-            self.error2 = ex.message
+            self.error2 = stringfy_error(ex)
         #self.__judge(player2_actions, 1) ##############################################
 
         for action in player1_actions:
