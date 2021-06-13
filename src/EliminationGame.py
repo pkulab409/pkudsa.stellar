@@ -103,8 +103,6 @@ class EliminationGame:
         return list(index_list[i:i + 2] for i in range(0, length, 2))
 
     def match_all(self, index_list: List[int], info):
-        if not os.path.exists(f"{info['name']}"):
-            os.mkdir(f"{info['name']}")
         print("="*40)
         print(info["name"])
         print("本轮参赛：", index_list)
