@@ -3,10 +3,11 @@ from HexagonForce import Generate_Hexagon
 from DesignGenerator import DesignGenerator
 from typing import List, Optional, Tuple, Callable
 import os
+import json
 
 rule1 = \
 [
-    {"name":"1/4决赛", "winner": "半决赛", "loser": "GG"},
+    {"name":"四分之一决赛", "winner": "半决赛", "loser": "GG"},
     {"name":"半决赛", "winner": "决赛", "loser": "季军争夺赛"},
     {"name":"决赛", "winner": "冠军", "loser": "亚军"},
     {"name":"季军争夺赛", "winner": "季军", "loser": "GG"},
@@ -45,15 +46,27 @@ class EliminationGame:
         self.repeat = repeat
         self.map_generator = map_generator
     
-    def match(self, player1_index: int, player2_index: int):
+    def match(self, player1_index: int, player2_index: int, round_name):
+        match_name = self.participants[player1_index] + " - " + self.participants[player2_index]
+        if not os.path.exists(f"{round_name}/{match_name}"):
+            os.mkdir(f"{round_name}/{match_name}")
+        print("-"*40)
         print(f"{self.participants[player1_index]} VS {self.participants[player2_index]}")
         score = [0, 0]
         player1 = self.participants[player1_index]
         player2 = self.participants[player2_index]
         for turn in range(self.repeat):
+            input()
             g = Game(player1, player2, self.map_generator())
             winner = g.run()
             history = g.get_history()
+            print(winner)
+            if winner == 0: 
+                print(self.participants[player1_index])
+            elif winner == 1:
+                print(self.participants[player2_index])
+            with open(f"{round_name}/{match_name}/{turn}.json", "w") as file:
+                json.dump(history, file)
             
             if winner == 0 or winner == 1:
                 score[winner] += 1
@@ -69,12 +82,14 @@ class EliminationGame:
         return list(zip(index_list[:length//2], index_list[-1:length//2 - 1:-1]))
     
     def match_all(self, index_list: List[int], info):
+        if not os.path.exists(f"{info['name']}"):
+            os.mkdir(f"{info['name']}")
         print("="*40)
         print(info["name"])
         print("本轮参赛：", index_list)
         group = self.make_group(index_list)
         print("对阵情况：", group)
-        res = list(list(x) for x in zip(*map(lambda pair: self.match(*pair), group)))
+        res = list(list(x) for x in zip(*map(lambda pair: self.match(*pair, info["name"]), group)))
         print(f"胜者：{res[0]} -> {info['winner']}")
         print(f"败者：{res[1]} -> {info['loser']}")
         return res
@@ -115,16 +130,16 @@ class EliminationGame:
 
 if __name__ == "__main__":
     ai_list = [
-        "stupidAI",
-        "stupidAI",
-        "stupidAI",
-        "stupidAI",
-        "stupidAI",
-        "stupidAI",
-        "stupidAI",
-        "stupidAI",
+        "delta",
+        "victor",
+        "papa",
+        "520",
+        "yankee",
+        "777",
+        "404",
+        "2333"
     ]
 
-    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 1)
+    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 2)
     a = e.single_elimination()
     
