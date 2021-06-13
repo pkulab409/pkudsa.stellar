@@ -66,9 +66,10 @@ class EliminationGame:
         Returns:
             str: The winner's name
         """
-        fourth_winners = self.match_all([*range(8)])[0]
-        semi_winners = self.match_all(fourth_winners)[0]
-        final_winner = self.match_all(semi_winners)[0]
+        fourth_winners = self.match_all([*range(8)], 'a. 8进4')[0]
+        semi_winners, semi_losers = self.match_all(fourth_winners, 'b. 半决赛')
+        final_winner = self.match_all(semi_winners, 'c. 决赛')[0]
+        third = self.match_all(semi_losers, 'd. 季军')[0]
         return self.participants[final_winner[0]]
 
     def double_elimination(self):
