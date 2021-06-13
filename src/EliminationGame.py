@@ -77,6 +77,14 @@ class EliminationGame:
             g = Game(player1, player2, self.map_generator())
             winner = g.run()
             history = g.get_history()
+            if 'add info':
+                history['names'] = [
+                    self.participants[i]
+                    for i in (player1_index, player2_index)
+                ]
+                if winner not in (0, 1):
+                    winner = None
+                history['winner'] = winner
             print(winner)
             if winner == 0:
                 print(self.participants[player1_index])
