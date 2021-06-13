@@ -72,8 +72,8 @@ class EliminationGame:
         score = [0, 0]
         player1 = self.participants[player1_index]
         player2 = self.participants[player2_index]
+        input()
         for turn in range(self.repeat):
-            input()
             g = Game(player1, player2, self.map_generator())
             winner = g.run()
             history = g.get_history()
@@ -99,7 +99,8 @@ class EliminationGame:
     def make_group(self, index_list: List[int]):
         length = len(index_list)
         assert length in (2, 4, 8)
-        return list(zip(index_list[:length//2], index_list[-1:length//2 - 1:-1]))
+        # return list(zip(index_list[:length//2], index_list[-1:length//2 - 1:-1]))
+        return list(index_list[i:i + 2] for i in range(0, length, 2))
 
     def match_all(self, index_list: List[int], info):
         if not os.path.exists(f"{info['name']}"):
@@ -161,5 +162,5 @@ if __name__ == "__main__":
     ]
     ai_list = ['stupidAI']*8
 
-    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 2)
+    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 11)
     a = e.single_elimination()
