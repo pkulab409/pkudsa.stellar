@@ -22,14 +22,14 @@ if 'disable print':
     sys.stdout = fake_out()
     print = deco_print(print)
 
-ROOT_DIR='D:/_test'
+ROOT_DIR='/mnt/data/ARENA_STORAGE/results/005'
 
 rule1 = \
 [
-    {"name":"四分之一决赛", "winner": "半决赛", "loser": "GG"},
-    {"name":"半决赛", "winner": "决赛", "loser": "季军争夺赛"},
-    {"name":"决赛", "winner": "冠军", "loser": "亚军"},
-    {"name":"季军争夺赛", "winner": "季军", "loser": "GG"},
+    {"name":"a. quarterfinal", "winner": "半决赛", "loser": "GG"},
+    {"name":"b. semifinal", "winner": "决赛", "loser": "季军争夺赛"},
+    {"name":"c. final", "winner": "冠军", "loser": "亚军"},
+    {"name":"d. for third place", "winner": "季军", "loser": "GG"},
 
 ]
 
