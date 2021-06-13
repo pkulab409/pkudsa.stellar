@@ -158,13 +158,13 @@ class EliminationGame:
 if __name__ == "__main__":
     ai_list = [
         "delta",
-        "victor",
-        "papa",
+        "2333"
         "520",
         "yankee",
+        "victor",
         "777",
+        "papa",
         "404",
-        "2333"
     ]
 
     e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 11)
