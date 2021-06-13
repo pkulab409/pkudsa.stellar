@@ -5,13 +5,15 @@ from typing import List, Optional, Tuple, Callable
 import os
 import json
 
+ROOT_DIR='D:/_test'
+
 rule1 = \
 [
     {"name":"四分之一决赛", "winner": "半决赛", "loser": "GG"},
     {"name":"半决赛", "winner": "决赛", "loser": "季军争夺赛"},
     {"name":"决赛", "winner": "冠军", "loser": "亚军"},
     {"name":"季军争夺赛", "winner": "季军", "loser": "GG"},
-    
+
 ]
 
 rule2 = \
@@ -19,16 +21,16 @@ rule2 = \
     {"name":"第一轮", "winner": "第二轮胜组", "loser": "第二轮败组首阶段"},
     {"name":"第二轮败组首阶段", "winner": "第二轮败组次阶段", "loser": "GG"},
     {"name":"第二轮胜组", "winner": "第三轮胜组", "loser": "第二轮败组次阶段"},
-    {"name":"第二轮败组次阶段", "winner": "第三轮败组首阶段", "loser": "GG"},   
-    {"name":"第三轮败组首阶段", "winner": "第三轮败组次阶段", "loser": "GG"},   
-    {"name":"第三轮胜组", "winner": "决赛", "loser": "第三轮败组次阶段"},   
-    {"name":"第三轮败组次阶段", "winner": "决赛", "loser": "季军"},  
-    {"name":"决赛", "winner": "冠军", "loser": "亚军"},  
+    {"name":"第二轮败组次阶段", "winner": "第三轮败组首阶段", "loser": "GG"},
+    {"name":"第三轮败组首阶段", "winner": "第三轮败组次阶段", "loser": "GG"},
+    {"name":"第三轮胜组", "winner": "决赛", "loser": "第三轮败组次阶段"},
+    {"name":"第三轮败组次阶段", "winner": "决赛", "loser": "季军"},
+    {"name":"决赛", "winner": "冠军", "loser": "亚军"},
 ]
 
 
 class EliminationGame:
-    
+
     def __init__(self, participants: List[str], map_generator: Callable, repeat: int=5):
         """Initialize an elimination game
 
@@ -45,11 +47,9 @@ class EliminationGame:
         self.participants = participants
         self.repeat = repeat
         self.map_generator = map_generator
-    
+
     def match(self, player1_index: int, player2_index: int, round_name):
         match_name = self.participants[player1_index] + " - " + self.participants[player2_index]
-        if not os.path.exists(f"{round_name}/{match_name}"):
-            os.mkdir(f"{round_name}/{match_name}")
         print("-"*40)
         print(f"{self.participants[player1_index]} VS {self.participants[player2_index]}")
         score = [0, 0]
@@ -61,13 +61,16 @@ class EliminationGame:
             winner = g.run()
             history = g.get_history()
             print(winner)
-            if winner == 0: 
+            if winner == 0:
                 print(self.participants[player1_index])
             elif winner == 1:
                 print(self.participants[player2_index])
-            with open(f"{round_name}/{match_name}/{turn}.json", "w") as file:
+            json_path = os.path.join(ROOT_DIR,
+                                     f"{round_name}/{match_name}/{turn}.json")
+            os.makedirs(os.path.dirname(json_path), exist_ok=1)
+            with open(json_path, "w") as file:
                 json.dump(history, file)
-            
+
             if winner == 0 or winner == 1:
                 score[winner] += 1
                 if score[winner] > self.repeat // 2 + 1:
@@ -75,12 +78,12 @@ class EliminationGame:
         #while score[0] == score[1]:
         print(f"{score[0]} -- {score[1]}")
         return (player1_index, player2_index) if score[0] > score[1] else (player2_index, player1_index)
-    
+
     def make_group(self, index_list: List[int]):
         length = len(index_list)
         assert length in (2, 4, 8)
         return list(zip(index_list[:length//2], index_list[-1:length//2 - 1:-1]))
-    
+
     def match_all(self, index_list: List[int], info):
         if not os.path.exists(f"{info['name']}"):
             os.mkdir(f"{info['name']}")
@@ -93,7 +96,7 @@ class EliminationGame:
         print(f"胜者：{res[0]} -> {info['winner']}")
         print(f"败者：{res[1]} -> {info['loser']}")
         return res
-        
+
     def single_elimination(self):
         """single elimination game
 
@@ -139,7 +142,7 @@ if __name__ == "__main__":
         "404",
         "2333"
     ]
+    ai_list = ['stupidAI']*8
 
     e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 2)
     a = e.single_elimination()
-    
