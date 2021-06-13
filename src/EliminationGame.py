@@ -2,9 +2,20 @@ from GameCore import Game
 from HexagonForce import Generate_Hexagon
 from DesignGenerator import DesignGenerator
 from typing import List, Optional, Tuple, Callable
-import os
+import os, json
+
+ROOT_PATH = r'D:/dir_test'
+
 
 class EliminationGame:
+    def dump_record(self, tag, plr_idx, round_idx, record):
+        plr_names = [self.participants[i] for i in plr_idx]
+        vs_group = f'{plr_idx[0]}.{plr_names[0]} vs. {plr_idx[1]}.{plr_names[1]}'
+        output_dir = os.path.join(ROOT_PATH, tag, vs_group,
+                                  f'{round_idx:02d}.json')
+        os.makedirs(os.path.dirname(output_dir), exist_ok=1)
+        with open(output_dir, 'w', encoding='utf-8') as f:
+            json.dump(record, f, ensure_ascii=0, separators=',:')
     
     def __init__(self, participants: List[str], map_generator: Callable, repeat: int=5):
         """Initialize an elimination game
@@ -30,6 +41,8 @@ class EliminationGame:
         for turn in range(self.repeat):
             g = Game(player1, player2, self.map_generator())
             winner = g.run()
+            self.dump_record(self.tag, (player1_index, player2_index), turn,
+                             g.get_history())
             if winner == 0 or winner == 1:
                 score[winner] += 1
                 if score[winner] > self.repeat // 2 + 1:
@@ -42,7 +55,8 @@ class EliminationGame:
         assert length in (2, 4, 8)
         return list(zip(index_list[:length//2], index_list[-1:length//2 - 1:-1]))
     
-    def match_all(self, index_list: List[int]):
+    def match_all(self, index_list: List[int], tag='default'):
+        self.tag = tag # match context
         group = self.make_group(index_list)
         return list(list(x) for x in zip(*map(lambda pair: self.match(*pair), group)))
     
@@ -89,6 +103,6 @@ if __name__ == "__main__":
     ]
 
     #e = EliminationGame(ai_list, DesignGenerator(0.8, (2, 4), 3), 5)
-    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(4, 0.20, 0.20), 5)
-    a = e.double_elimination()
+    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 5)
+    a = e.single_elimination()
     print(a)
