@@ -5,6 +5,23 @@ from typing import List, Optional, Tuple, Callable
 import os
 import json
 
+if 'disable print':
+
+    class fake_out:
+        def __getattr__(self, a):
+            return lambda *a, **k: 0
+
+    def deco_print(func):
+        def inner(*a, **k):
+            k['file'] = k.get('file', sys.__stdout__)
+            return func(*a, **k)
+
+        return inner
+
+    import sys
+    sys.stdout = fake_out()
+    print = deco_print(print)
+
 ROOT_DIR='D:/_test'
 
 rule1 = \
