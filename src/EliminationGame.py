@@ -156,6 +156,9 @@ class EliminationGame:
         return [*map(lambda x: self.participants[x], first + second + third + fourth)]
 
 if __name__ == "__main__":
+    import shutil
+    shutil.rmtree(ROOT_DIR)
+
     ai_list = [
         "delta",
         "2333"
