@@ -158,7 +158,6 @@ if __name__ == "__main__":
         "404",
         "2333"
     ]
-    ai_list = ['stupidAI']*8
 
     e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 11)
     a = e.single_elimination()
