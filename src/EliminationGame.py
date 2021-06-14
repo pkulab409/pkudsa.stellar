@@ -46,6 +46,23 @@ rule2 = \
 ]
 
 
+def mapgen_pack():
+    params = [
+        (7, 0.45, 0.25),
+        (7, 0.22, 0.3),
+        (7, 0.1, 0.1),
+    ]
+    i = 0
+
+    def inner():
+        nonlocal i
+        map = Generate_Hexagon(*params[i])
+        i = (i + 1) % len(params)
+        return map
+
+    return inner
+
+
 class EliminationGame:
 
     def __init__(self, participants: List[str], map_generator: Callable, repeat: int=5):
@@ -166,5 +183,5 @@ if __name__ == "__main__":
         "_404",
     ]
 
-    e = EliminationGame(ai_list, lambda:  Generate_Hexagon(7, 0.35, 0.10), 11)
+    e = EliminationGame(ai_list, mapgen_pack(), 9)
     a = e.single_elimination()
